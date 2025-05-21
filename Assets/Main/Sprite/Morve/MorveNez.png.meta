@@ -117,6 +117,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -309,7 +322,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MorveNez_0: -9062070311768398260
+      MorveNez_1: -1896497332694093187
+      MorveNez_2: -8978299503050281763
+      MorveNez_3: -4012289676426146446
+      MorveNez_4: -7371371381834277072
+      MorveNez_5: -5028975677828799974
+      MorveNez_6: 1817178799665334770
+      MorveNez_7: -7234502779121686701
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

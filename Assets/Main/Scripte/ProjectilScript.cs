@@ -54,6 +54,7 @@ public class ProjectilScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ennemies"))
         {
             collision.gameObject.GetComponent<EnnemieHealth>().UpdateHealth(-AmountDamage);
+            Destroy(gameObject);
         }
     }
 

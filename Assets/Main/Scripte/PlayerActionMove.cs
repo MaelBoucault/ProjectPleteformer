@@ -91,7 +91,10 @@ public class PlayerActionMove : MonoBehaviour
     {
         if (collision.GetComponent<Scriptmorve>())
         {
-            StartCoroutine(ResetCanDash());
+            if (gameObject.activeInHierarchy)
+            {
+                StartCoroutine(ResetCanDash());
+            }
         }
     }
 

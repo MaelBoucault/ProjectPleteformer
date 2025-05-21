@@ -1,19 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEditor.Animations;
+
 
 public class EnemyShoot : MonoBehaviour
 {
     public GameObject kayouPrefab;
     public float shootInterval = 2f;
     public float shootForce = 5f;
+
     private Transform player;
     private bool isChasing = false;
     private float shootTimer = 0f;
+    private bool hasShot = false;
 
     private EnemyAI2D enemyAI;
-
     private Animator animator;
+
+    public AnimationClip AnimationAttack;
+
+    public AnimatorController AnimationController;
 
     void Start()
     {
@@ -31,37 +38,37 @@ public class EnemyShoot : MonoBehaviour
         if (isChasing)
         {
             shootTimer += Time.deltaTime;
-            if (shootTimer >= shootInterval)
+
+            if (shootTimer >= shootInterval && !hasShot)
             {
-                ShootKayou();
+                animator.SetBool("Attacking", true);
                 shootTimer = 0f;
+                hasShot = true;
             }
         }
     }
 
-    void ShootKayou()
+    public void ShootKayou()
     {
-        animator.SetBool("Attacking", enemyAI.Attack);
-        enemyAI.Attack = true;
-        if (kayouPrefab == null || player == null) return;
-
-        GameObject kayou = Instantiate(kayouPrefab, transform.position, Quaternion.identity);
-
-        Vector2 direction = (player.position - transform.position).normalized;
-
-        Rigidbody2D kayouRb = kayou.GetComponent<Rigidbody2D>();
-        if (kayouRb != null)
+        if (!enemyAI.Attack)
         {
-            kayouRb.linearVelocity = direction * shootForce;
-        }
+            enemyAI.Attack = true;
+            GameObject kayou = Instantiate(kayouPrefab, transform.position + new Vector3(0,1f,0), Quaternion.identity);
 
-        StartCoroutine(RestartAttack());
+            Vector2 direction = (player.position - transform.position).normalized;
+
+            Rigidbody2D kayouRb = kayou.GetComponent<Rigidbody2D>();
+            if (kayouRb != null)
+            {
+                kayouRb.linearVelocity = direction * shootForce;
+            }
+        }
     }
 
-    IEnumerator RestartAttack()
+    public void RestartAttack()
     {
-        yield return new WaitForSeconds(5f);
-
         enemyAI.Attack = false;
+        hasShot = false;
+        animator.SetBool("Attacking",false);
     }
 }

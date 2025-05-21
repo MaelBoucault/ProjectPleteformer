@@ -15,8 +15,12 @@ public class EnemyAI2D : MonoBehaviour
     internal bool chasing = false;
     private Rigidbody2D rb;
     private Vector3 originalScale;
+    public GameObject Aurra;
 
     Animator animator;
+
+    internal Vector2 direction = Vector2.zero;
+    
 
     internal bool Attack;
 
@@ -37,10 +41,12 @@ public class EnemyAI2D : MonoBehaviour
         if (distanceToPlayer < detectionRange)
         {
             chasing = true;
+            Aurra.SetActive(true);
         }
         else if (distanceToPlayer > stopChaseRange)
         {
             chasing = false;
+            Aurra.SetActive(false);
         }
 
         if (chasing)
@@ -72,7 +78,7 @@ public class EnemyAI2D : MonoBehaviour
         {
             Vector2 currentPosition = rb.position;
             Vector2 targetPosition = new Vector2(target.x, currentPosition.y);
-            Vector2 direction = (targetPosition - currentPosition).normalized;
+            direction = (targetPosition - currentPosition).normalized;
 
             animator.SetFloat("Speed", Math.Abs(direction.x));
 

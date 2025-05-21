@@ -25,6 +25,8 @@ public class FlyingEyeController : MonoBehaviour
     private float currentRayLength = 0f;
     private float targetRayLength = 100f;
 
+    private float baseRotationOffset = 180f; // L'offset pour que l'œil regarde à gauche par défaut
+
     void Start()
     {
         startPos = transform.position;
@@ -51,8 +53,6 @@ public class FlyingEyeController : MonoBehaviour
             activeRay.transform.rotation = currentRayRotation;
 
             currentRayLength = Mathf.Lerp(currentRayLength, targetRayLength, Time.deltaTime * lengthLerpSpeed);
-            activeRay.transform.localScale = new Vector3(currentRayLength, activeRay.transform.localScale.y, 1f);
-
             activeRay.transform.position = transform.position;
         }
     }
@@ -65,7 +65,16 @@ public class FlyingEyeController : MonoBehaviour
         }
 
         Vector3 dir = (wanderTarget - transform.position).normalized;
+
+        // Déplacement
         rb.MovePosition(transform.position + dir * moveSpeed * Time.deltaTime);
+
+        // Rotation : faire en sorte que l'œil regarde dans la direction du déplacement
+        if (dir != Vector3.zero)
+        {
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + baseRotationOffset;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
     }
 
     void PickNewWanderTarget()
@@ -81,7 +90,22 @@ public class FlyingEyeController : MonoBehaviour
         if (Time.time - lastAttackTime >= attackCooldown && activeRay == null)
         {
             lastAttackTime = Time.time;
+            LookAtTarget();  // Faire en sorte que l'œil regarde le joueur avant de tirer
             FireRay();
+        }
+    }
+
+    void LookAtTarget()
+    {
+        if (target != null)
+        {
+            Vector2 dir = (target.position - transform.position).normalized;
+            // Calculer l'angle nécessaire pour que l'œil regarde la cible
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + baseRotationOffset;
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+
+            // Rotation lissée
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
         }
     }
 
@@ -89,16 +113,20 @@ public class FlyingEyeController : MonoBehaviour
     {
         if (rayPrefab != null && target != null)
         {
-            activeRay = Instantiate(rayPrefab, transform.position, Quaternion.identity);
+            Vector2 dir = (target.position - transform.position).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            Quaternion rayRotation = Quaternion.Euler(0f, 0f, angle);
+
+            activeRay = Instantiate(rayPrefab, transform.position, rayRotation);
             activeRay.transform.parent = transform;
 
             if (magicParticles != null)
                 Instantiate(magicParticles, transform.position, Quaternion.identity);
 
-            currentRayRotation = activeRay.transform.rotation;
+            currentRayRotation = rayRotation;
             currentRayLength = 0f;
 
-            StartCoroutine(DestroyRayAfterSeconds(3f)); // <- durée modifiée ici
+            //StartCoroutine(DestroyRayAfterSeconds(3f));
         }
         else
         {

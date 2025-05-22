@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ItemThrower : MonoBehaviour
 {
-    [Header("projectil")]
+    [Header("Projectil")]
     public GameObject[] itemPrefabs;
     public Transform throwOrigin;
     public float throwForce = 10f;
@@ -12,9 +12,12 @@ public class ItemThrower : MonoBehaviour
     public Animator Animator;
 
     private PlayerActionMove PlayerActionMove;
-
+    public bool useController = false;
     private bool isShooting = false;
     private Coroutine shootCoroutine;
+
+
+    public GameObject PauseSrciptCanvas;
 
     private void Start()
     {
@@ -23,22 +26,25 @@ public class ItemThrower : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!PauseSrciptCanvas.GetComponent<PauseSrcipt>().isPause)
         {
-            if (shootCoroutine == null)
+            if (Input.GetButtonDown("Fire1"))
             {
-                isShooting = true;
-                shootCoroutine = StartCoroutine(ShootRepeatedly());
+                if (shootCoroutine == null)
+                {
+                    isShooting = true;
+                    shootCoroutine = StartCoroutine(ShootRepeatedly());
+                }
             }
-        }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            isShooting = false;
-            if (shootCoroutine != null)
+            if (Input.GetButtonUp("Fire1"))
             {
-                StopCoroutine(shootCoroutine);
-                shootCoroutine = null;
+                isShooting = false;
+                if (shootCoroutine != null)
+                {
+                    StopCoroutine(shootCoroutine);
+                    shootCoroutine = null;
+                }
             }
         }
     }
@@ -53,7 +59,7 @@ public class ItemThrower : MonoBehaviour
                 ThrowItem();
             }
 
-            yield return new WaitForSeconds(0.5f); // Tir toutes les 0.5 secondes
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -66,30 +72,41 @@ public class ItemThrower : MonoBehaviour
         GameObject itemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
         GameObject item = Instantiate(itemPrefab, throwOrigin.position, Quaternion.identity);
 
-        // Direction vers la souris
-        Vector3 mouseScreenPos = Input.mousePosition;
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, Camera.main.nearClipPlane));
-        Vector2 direction = (mouseWorldPos - throwOrigin.position).normalized;
+        Vector2 direction;
 
-        // Flip le joueur selon la direction
-        if (mouseWorldPos.x > transform.position.x)
+        if (useController)
         {
+            // Visée avec le stick gauche
+            float aimX = Input.GetAxis("Horizontal");
+            float aimY = Input.GetAxis("Vertical");
+            direction = new Vector2(aimX, aimY);
+
+            if (direction.sqrMagnitude < 0.1f)
+                direction = Vector2.right;
+            else
+                direction.Normalize();
+        }
+        else
+        {
+            // Visée souris
+            Vector3 mouseScreenPos = Input.mousePosition;
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(
+                new Vector3(mouseScreenPos.x, mouseScreenPos.y, Camera.main.nearClipPlane));
+            direction = (mouseWorldPos - throwOrigin.position).normalized;
+        }
+
+        // Flip du sprite
+        if (direction.x > 0)
             transform.localScale = new Vector3(0.5f, 0.5f, 1);
-        }
-        else if (mouseWorldPos.x < transform.position.x)
-        {
+        else if (direction.x < 0)
             transform.localScale = new Vector3(-0.5f, 0.5f, 1);
-        }
 
         Rigidbody2D rb = item.GetComponent<Rigidbody2D>();
         if (rb != null)
-        {
             rb.AddForce(direction * throwForce, ForceMode2D.Impulse);
-        }
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        float offset = -90f;
-        item.transform.rotation = Quaternion.Euler(0f, 0f, angle + offset);
+        item.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
 
         StartCoroutine(RestartBoolAttack());
     }
@@ -99,4 +116,5 @@ public class ItemThrower : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         Animator.SetBool("Attack", false);
     }
+
 }

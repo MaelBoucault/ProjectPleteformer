@@ -6,7 +6,7 @@ public class CollisionPlayer : MonoBehaviour
     {
         if (collision.gameObject.tag == "Fall")
         {
-            gameObject.GetComponent<PlayerHealth>().UpdateHealth(-gameObject.GetComponent<PlayerHealth>().MaxHealth);
+            gameObject.GetComponent<PlayerHealth>().UpdateHealth(-gameObject.GetComponent<PlayerHealth>().MaxHealth, new Vector3(0,0,0));
         }
 
     }

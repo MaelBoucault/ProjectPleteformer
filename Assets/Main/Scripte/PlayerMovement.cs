@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 8f;
-    public float jumpForce = 10f;
+    public float moveSpeed;
+    public float jumpForce;
     private Rigidbody2D rb;
 
     [Header("Jump Mechanics")]
@@ -15,19 +15,19 @@ public class PlayerMovement : MonoBehaviour
     public float jumpBufferTime = 0.8f;
 
     [Header("Better Jump")]
-    public float fallMultiplier = 2.5f;
-    public float lowJumpMultiplier = 2f;
+    public float fallMultiplier;
+    public float lowJumpMultiplier;
     private float coyoteTimer;
     private float jumpBufferTimer;
 
-    public float JumpNbMax = 2;
+    public float JumpNbMax;
     public float JumpNb;
 
     public bool Jump = false;
 
     [Header("Ground Check")]
     public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
+    public float groundCheckRadius;
     public LayerMask groundLayer;
     internal bool isGrounded = false;
 
@@ -114,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.gravityScale = 1f;
+            rb.gravityScale = 5f;
         }
     }
 
@@ -129,9 +129,10 @@ public class PlayerMovement : MonoBehaviour
 
         if (JumpNb < JumpNbMax && isGrounded)
         {
-            JumpNb += 0.1f * Time.deltaTime;
+            JumpNb += 0.5f * Time.deltaTime;
             JumpNb = Mathf.Min(JumpNb, JumpNbMax);
         }
+
     }
 
     void OnDrawGizmosSelected()

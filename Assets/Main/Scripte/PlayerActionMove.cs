@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class PlayerActionMove : MonoBehaviour
 {
     [Header("Dash Settings")]
-    public float dashForce = 20f;
+    public float dashForce;
     public float dashDuration = 0.2f;
-    public float dashCooldown = 1f;
-    public float dashManaCost = 25f;
+    public float dashCooldown = 0.5f;
+    public float dashManaCost = 5f;
 
     [Header("Mana Settings")]
-    public float maxMana = 100f;
+    public float maxMana = 150f;
     public float manaRegenRate = 10f;
 
     public float currentMana;
@@ -98,7 +98,6 @@ public class PlayerActionMove : MonoBehaviour
 
     void StartDash()
     {
-        dashForce = 20f;
         isDashing = true;
         dashTimer = dashDuration;
         cooldownTimer = dashCooldown;
@@ -137,15 +136,15 @@ public class PlayerActionMove : MonoBehaviour
 
             GameObject pilier = Instantiate(PilierPrefab, transform.position - new Vector3 (0,5,0), Quaternion.identity);
             pilier.GetComponent<Pilier>().SetTarget(gameObject.GetComponent<PlayerMovement>().groundCheck.position);
-            dashForce += 5f;
+            dashForce = 25f;
             
         }
         if ((vertical == 0 && horizontal >= 0.1f) && GetComponent<PlayerMovement>().isGrounded)
         {
-            dashForce += 8;
+            dashForce = 28f;
         }else if (!(GetComponent<PlayerMovement>().isGrounded))
         {
-            dashForce -= 5;
+            dashForce = 25f;
         }
 
         rb.linearVelocity = dashDirection * dashForce;
@@ -166,6 +165,7 @@ public class PlayerActionMove : MonoBehaviour
             StartCoroutine(RechargeManaDash());
         }
     }
+
 
     IEnumerator RechargeManaDash()
     {

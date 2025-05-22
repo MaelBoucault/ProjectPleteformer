@@ -2351,8 +2351,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 11, y: -12}
-  m_SizeDelta: {x: 200, y: 200}
+  m_AnchoredPosition: {x: 2.1124, y: -13}
+  m_SizeDelta: {x: 95.7753, y: 95.7754}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &655976946
 MonoBehaviour:
@@ -2708,13 +2708,14 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1354728840}
   m_Father: {fileID: 2041416495}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 60, y: -54}
-  m_SizeDelta: {x: 180, y: 180}
+  m_AnchoredPosition: {x: 25.00002, y: -25}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &983724847
 MonoBehaviour:
@@ -3582,11 +3583,11 @@ Transform:
   m_GameObject: {fileID: 1354728839}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 46.12375, y: 192.89334, z: 8.211472}
-  m_LocalScale: {x: 2500, y: 250, z: 21.184334}
+  m_LocalPosition: {x: 50.9, y: -50.9, z: 0}
+  m_LocalScale: {x: 750, y: 750, z: 21.184336}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2041416495}
+  m_Father: {fileID: 983724846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1354728841
 SpriteRenderer:
@@ -4982,15 +4983,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1354728840}
   - {fileID: 983724846}
   - {fileID: 655976945}
   m_Father: {fileID: 424009012}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 26.874, y: 0}
-  m_SizeDelta: {x: 300, y: 300}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &2041416496
 MonoBehaviour:
@@ -5495,12 +5495,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1594051197}
     - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
+      propertyPath: dashForce
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
+      propertyPath: currentMana
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: slider_mana
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
+      propertyPath: dashDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: dashManaCost
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 72438832327239114, guid: d9edd90147e293040b682971022861bd, type: 3}
+      propertyPath: manaRegenRate
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 171417328293343575, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: m_Name
@@ -5512,11 +5528,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2154803179295075958, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 72.6
+      value: 4.48
       objectReference: {fileID: 0}
     - target: {fileID: 2154803179295075958, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 22.4
+      value: 4.3
       objectReference: {fileID: 0}
     - target: {fileID: 2154803179295075958, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5572,7 +5588,7 @@ PrefabInstance:
       objectReference: {fileID: 361380498}
     - target: {fileID: 4927393547814203242, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: jumpForce
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4927393547814203242, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: moveSpeed
@@ -5584,7 +5600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4927393547814203242, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: fallMultiplier
-      value: 3.5
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 4927393547814203242, guid: d9edd90147e293040b682971022861bd, type: 3}
       propertyPath: groundCheckRadius

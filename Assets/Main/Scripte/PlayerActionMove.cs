@@ -14,7 +14,6 @@ public class PlayerActionMove : MonoBehaviour
     [Header("Mana Settings")]
     public float maxMana = 100f;
     public float manaRegenRate = 10f;
-    public Slider slider_mana;
 
     public float currentMana;
 
@@ -47,8 +46,6 @@ public class PlayerActionMove : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         currentMana = maxMana;
 
-        if (slider_mana != null)
-            slider_mana.maxValue = maxMana;
     }
 
     void Update()
@@ -170,12 +167,6 @@ public class PlayerActionMove : MonoBehaviour
         }
     }
 
-    public void UpdateManaUI()
-    {
-        if (slider_mana != null)
-            slider_mana.value = currentMana;
-    }
-
     IEnumerator RechargeManaDash()
     {
         isRegeneratingMana = true;
@@ -187,7 +178,6 @@ public class PlayerActionMove : MonoBehaviour
             currentMana += manaRegenRate;
             currentMana = Mathf.Min(currentMana, maxMana);
 
-            UpdateManaUI();
         }
 
         isRegeneratingMana = false;

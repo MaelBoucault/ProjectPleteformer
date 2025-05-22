@@ -20,7 +20,6 @@ public class PlayerMovement : MonoBehaviour
     private float coyoteTimer;
     private float jumpBufferTimer;
 
-    public Slider SliderJump;
     public float JumpNbMax = 2;
     public float JumpNb;
 
@@ -132,11 +131,6 @@ public class PlayerMovement : MonoBehaviour
         {
             JumpNb += 0.1f * Time.deltaTime;
             JumpNb = Mathf.Min(JumpNb, JumpNbMax);
-        }
-
-        if (SliderJump != null)
-        {
-            SliderJump.value = (JumpNb / JumpNbMax) * 100f;
         }
     }
 

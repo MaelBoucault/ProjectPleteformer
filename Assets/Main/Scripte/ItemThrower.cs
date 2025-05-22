@@ -65,8 +65,7 @@ public class ItemThrower : MonoBehaviour
 
     void ThrowItem()
     {
-        PlayerActionMove.currentMana -= 10f;
-        PlayerActionMove.UpdateManaUI();
+        PlayerActionMove.currentMana -= 5f;
         if (itemPrefabs.Length == 0) return;
 
         GameObject itemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];

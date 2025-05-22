@@ -1,52 +1,90 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BardeScripte : MonoBehaviour
 {
     public float soinRange = 5f;
     public float healAmount = 5f;
     public float healInterval = 1f;
-    public GameObject healEffectPrefab; // FX à instancier sur les ennemis
+    public GameObject healEffectPrefab;
 
     public GameObject Aurra;
+    public GameObject BigAurra;
 
-    private float timer = 0f;
+    private SpriteRenderer SpriteRendererAurra;
+    private bool isHealing = false;
 
-    void Update()
+    private void Start()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= healInterval)
-        {
-            SoignerAllies();
-            timer = 0f;
-        }
+        BigAurra.SetActive(false);
+        SpriteRendererAurra = Aurra.GetComponent<SpriteRenderer>();
+        SetAuraAlpha(0.5f); // Valeur par défaut
+        StartCoroutine(HealingLoop());
     }
 
-    void SoignerAllies()
+    IEnumerator HealingLoop()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, soinRange);
-
-        foreach (Collider2D col in colliders)
+        while (true)
         {
-            if (col.CompareTag("Ennemies"))
-            {
-                EnnemieHealth ennemi = col.GetComponent<EnnemieHealth>();
-                if (ennemi != null && ennemi.health < ennemi.maxHealth)
-                {
-                    ennemi.UpdateHealth(healAmount);
+            bool healedSomeone = false;
 
-                    // Particules de soin
-                    if (healEffectPrefab != null)
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, soinRange);
+
+            foreach (Collider2D col in colliders)
+            {
+                if (col.CompareTag("Ennemies"))
+                {
+                    EnnemieHealth ennemi = col.GetComponent<EnnemieHealth>();
+                    if (ennemi != null && ennemi.health < ennemi.maxHealth)
                     {
-                        Instantiate(healEffectPrefab, col.transform.position, Quaternion.identity);
+                        // Appliquer le soin
+                        ennemi.UpdateHealth(healAmount);
+                        healedSomeone = true;
+
+                        // FX de soin
+                        if (healEffectPrefab != null)
+                        {
+                            Instantiate(healEffectPrefab, col.transform.position, Quaternion.identity);
+                        }
                     }
                 }
             }
+
+            // Affichage des auras
+            if (healedSomeone)
+            {
+                if (!isHealing)
+                {
+                    SetAuraAlpha(1f);
+                    BigAurra.SetActive(true);
+                    isHealing = true;
+                }
+            }
+            else
+            {
+                if (isHealing)
+                {
+                    SetAuraAlpha(0.5f);
+                    BigAurra.SetActive(false);
+                    isHealing = false;
+                }
+            }
+
+            yield return new WaitForSeconds(healInterval);
         }
     }
 
-    // Visualiser la zone de soin dans l'éditeur
+    void SetAuraAlpha(float alpha)
+    {
+        if (SpriteRendererAurra != null)
+        {
+            Color c = SpriteRendererAurra.color;
+            c.a = alpha;
+            SpriteRendererAurra.color = c;
+        }
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;

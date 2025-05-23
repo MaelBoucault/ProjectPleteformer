@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,8 +41,11 @@ public class PlayerActionMove : MonoBehaviour
 
     public GameObject Morve;
 
+    private Animator Animator;
+
     void Awake()
     {
+        Animator = GetComponent<Animator>();
         PlayerMovementScript = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
         currentMana = maxMana;
@@ -50,6 +54,8 @@ public class PlayerActionMove : MonoBehaviour
 
     void Update()
     {
+        
+
         PilierTxt.text = Pilier.ToString();
 
         HandleMana();
@@ -72,6 +78,7 @@ public class PlayerActionMove : MonoBehaviour
         }
 
         Morve.SetActive(CanDash);
+
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -153,6 +160,7 @@ public class PlayerActionMove : MonoBehaviour
         }
         if ((vertical == 0 && horizontal >= 0.1f) && GetComponent<PlayerMovement>().isGrounded)
         {
+            
             dashForce = 28f;
             CameraShake.Shake(0.2f, 0.3f);
         }
@@ -160,7 +168,16 @@ public class PlayerActionMove : MonoBehaviour
         {
             dashForce = 25f;
             CameraShake.Shake(0.15f, 0.2f);
-        }else CameraShake.Shake(0.15f, 0.2f);
+            
+        }
+        else
+        {
+            CameraShake.Shake(0.15f, 0.2f);
+            
+        }
+
+        if ( !(Math.Abs(vertical) > 0.1f && horizontal == 0))
+            Animator.SetBool("IsDashHorizontal", true);
 
         rb.linearVelocity = dashDirection * dashForce;
         
@@ -181,6 +198,8 @@ public class PlayerActionMove : MonoBehaviour
     {
         isDashing = false;
         rb.linearVelocity = Vector2.zero;
+        Animator.SetBool("IsDashHorizontal", IsDashing);
+
     }
 
     void HandleMana()

@@ -3,13 +3,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 
 public class PlayerHealth : MonoBehaviour
 {
     private Rigidbody2D rb;
-
+    private Vector2 vignetteTargetCenter;
     private Color originalColor;
+
+
 
     [Header("Health")]
     public float CurrentHealth;
@@ -24,6 +28,14 @@ public class PlayerHealth : MonoBehaviour
     public float invincibilityTime = 1f;
     SpriteRenderer playerRenderer;
 
+    [Header("UI Vignette")]
+    public Image DamageVignette;
+
+    [Header("Post-Process")]
+    public Volume postProcessVolume;
+    private Vignette vignette;
+
+
     [Header("Itween")]
     public Vector3 amount;
     public float time;
@@ -34,6 +46,11 @@ public class PlayerHealth : MonoBehaviour
         CurrentHealth = MaxHealth;
         playerRenderer = GetComponent<SpriteRenderer>();
         originalColor = playerRenderer.color;
+
+        if (postProcessVolume != null && postProcessVolume.profile.TryGet(out Vignette v))
+        {
+            vignette = v;
+        }
     }
 
     private void Update()
@@ -51,6 +68,15 @@ public class PlayerHealth : MonoBehaviour
 
             if (Amount < 0)
             {
+
+                float vignetteIntensity = Mathf.Clamp01(Mathf.Abs(Amount) / 50f);
+                StartCoroutine(ShowPostProcessVignette(vignetteIntensity));
+
+
+                float shakeIntensity = Mathf.Clamp01(Mathf.Abs(Amount) / 50f);
+                float shakeDuration = Mathf.Lerp(0.1f, 0.4f, shakeIntensity);
+                CameraShake.Shake(shakeIntensity * 0.2f, shakeDuration);
+
                 float punchAmount = Mathf.Abs(Amount) * 0.2f;
                 if (punchAmount >= 1f) punchAmount = 1f;
 
@@ -119,5 +145,56 @@ public class PlayerHealth : MonoBehaviour
 
         playerRenderer.color = originalColor;
     }
+
+    void OnUpdateVignetteCenter(object val)
+    {
+        vignette.center.value = (Vector2)val;
+    }
+
+
+    IEnumerator ShowPostProcessVignette(float intensity)
+    {
+        if (vignette == null) yield break;
+
+        float targetIntensity = Mathf.Lerp(0.4f, 0.8f, intensity);
+        vignette.intensity.value = 0f;
+
+        Vector2 originalCenter = vignette.center.value;
+        vignetteTargetCenter = originalCenter + new Vector2(Random.Range(-0.15f, 0.15f), Random.Range(-0.15f, 0.15f));
+
+        // Shake vers une nouvelle position
+        iTween.ValueTo(gameObject, iTween.Hash(
+            "from", originalCenter,
+            "to", vignetteTargetCenter,
+            "time", 0.2f,
+            "onupdate", "OnUpdateVignetteCenter",
+            "onupdatetarget", gameObject
+        ));
+
+        for (float t = 0; t < 1; t += Time.deltaTime * 6)
+        {
+            vignette.intensity.value = Mathf.Lerp(0f, targetIntensity, t);
+            yield return null;
+        }
+
+        // Retour vers la position d’origine
+        iTween.ValueTo(gameObject, iTween.Hash(
+            "from", vignette.center.value,
+            "to", originalCenter,
+            "time", 0.4f,
+            "onupdate", "OnUpdateVignetteCenter",
+            "onupdatetarget", gameObject
+        ));
+
+        for (float t = 0; t < 1; t += Time.deltaTime * 1.5f)
+        {
+            vignette.intensity.value = Mathf.Lerp(targetIntensity, 0f, t);
+            yield return null;
+        }
+
+        vignette.intensity.value = 0f;
+        vignette.center.value = originalCenter;
+    }
+
 
 }

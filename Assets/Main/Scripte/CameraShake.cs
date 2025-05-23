@@ -1,22 +1,15 @@
 using UnityEngine;
-using System.Collections;
 
 public class CameraShake : MonoBehaviour
 {
-    public static IEnumerator Shake()
+    public static void Shake(float intensity = 0.1f, float duration = 0.2f)
     {
-        Vector3 originalPosition = Camera.main.transform.position;
-        float shakeAmount = 0.05f;
-        float shakeDuration = 0.2f;
+        GameObject cam = Camera.main.gameObject;
 
-        float elapsed = 0f;
-        while (elapsed < shakeDuration)
-        {
-            Camera.main.transform.position = originalPosition + (Random.insideUnitSphere * shakeAmount);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        Camera.main.transform.position = originalPosition;
+        iTween.ShakePosition(cam, iTween.Hash(
+            "amount", new Vector3(intensity, intensity, 0),
+            "time", duration,
+            "easetype", iTween.EaseType.easeOutExpo
+        ));
     }
 }

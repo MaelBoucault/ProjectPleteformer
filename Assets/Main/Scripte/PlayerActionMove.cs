@@ -127,6 +127,12 @@ public class PlayerActionMove : MonoBehaviour
                     shockwaveScript.radius = 5f;
                     shockwaveScript.lifetime = 1f;
                 }
+
+                iTween.ScaleFrom(shockwave, iTween.Hash(
+                    "scale", new Vector3(0.1f, 0.1f, 0.1f),
+                    "time", 0.2f,
+                    "easetype", iTween.EaseType.easeOutExpo
+                ));
             }
         }
 
@@ -136,18 +142,37 @@ public class PlayerActionMove : MonoBehaviour
 
             GameObject pilier = Instantiate(PilierPrefab, transform.position - new Vector3 (0,5,0), Quaternion.identity);
             pilier.GetComponent<Pilier>().SetTarget(gameObject.GetComponent<PlayerMovement>().groundCheck.position);
-            dashForce = 25f;
-            
+            dashForce = 20f;
+            CameraShake.Shake(0.1f, 0.15f);
+            iTween.ScaleFrom(pilier, iTween.Hash(
+                "scale", new Vector3(0.1f, 0.1f, 0.1f),
+                "time", 0.3f,
+                "easetype", iTween.EaseType.easeOutBack
+            ));
+
         }
         if ((vertical == 0 && horizontal >= 0.1f) && GetComponent<PlayerMovement>().isGrounded)
         {
             dashForce = 28f;
-        }else if (!(GetComponent<PlayerMovement>().isGrounded))
+            CameraShake.Shake(0.2f, 0.3f);
+        }
+        else if (!(GetComponent<PlayerMovement>().isGrounded))
         {
             dashForce = 25f;
-        }
+            CameraShake.Shake(0.15f, 0.2f);
+        }else CameraShake.Shake(0.15f, 0.2f);
 
         rb.linearVelocity = dashDirection * dashForce;
+        
+
+        GameObject visual = transform.gameObject;
+
+        iTween.PunchPosition(visual, iTween.Hash(
+            "amount", new Vector3(dashDirection.x, dashDirection.y, 0) * 1.2f,
+            "time", 0.3f,
+            "easetype", iTween.EaseType.easeOutQuad
+        ));
+
     }
 
 

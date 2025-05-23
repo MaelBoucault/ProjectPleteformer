@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 7097683003848081483}
   - component: {fileID: 2513406345045590684}
   - component: {fileID: 8542679400092009509}
-  - component: {fileID: 7570201965701324299}
   - component: {fileID: 6344691543448043871}
   - component: {fileID: 5161163369155025732}
+  - component: {fileID: 2628782794983094813}
   m_Layer: 0
   m_Name: Yeux
   m_TagString: Ennemies
@@ -118,7 +118,47 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &7570201965701324299
+--- !u!114 &6344691543448043871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8236380564786917342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d1308317e0197540b5ad675c9bdf27c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wanderRadius: 10
+  moveSpeed: 5
+  detectionRadius: 15
+  attackCooldown: 2
+  rayPrefab: {fileID: 4656140642985556137, guid: 80922f6452e995f4fa7b09c1c3e59f05, type: 3}
+  magicParticles: {fileID: 6896764003347309879, guid: 30b7671c716fd0d4ba01bb47d737f468, type: 3}
+  target: {fileID: 0}
+  rotationLerpSpeed: 5
+  lengthLerpSpeed: 5
+--- !u!114 &5161163369155025732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8236380564786917342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 125b566dafcd08f4394c59d2598f1010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 50
+  maxHealth: 50
+  invincibility: 0
+  invincibilityTime: 0.5
+  EnnemiePrefab: {fileID: 8236380564786917342}
+  amount: {x: 0.5, y: 0.2, z: 0}
+  time: 0.5
+--- !u!61 &2628782794983094813
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -162,43 +202,5 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4.1, y: 4.1}
   m_EdgeRadius: 0
---- !u!114 &6344691543448043871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8236380564786917342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d1308317e0197540b5ad675c9bdf27c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wanderRadius: 10
-  moveSpeed: 5
-  detectionRadius: 15
-  attackCooldown: 2
-  rayPrefab: {fileID: 4656140642985556137, guid: 80922f6452e995f4fa7b09c1c3e59f05, type: 3}
-  magicParticles: {fileID: 6896764003347309879, guid: 30b7671c716fd0d4ba01bb47d737f468, type: 3}
-  target: {fileID: 0}
-  rotationLerpSpeed: 5
-  lengthLerpSpeed: 5
---- !u!114 &5161163369155025732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8236380564786917342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 125b566dafcd08f4394c59d2598f1010, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 50
-  maxHealth: 50
-  invincibility: 0
-  invincibilityTime: 0.5
-  EnnemiePrefab: {fileID: 8236380564786917342}

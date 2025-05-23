@@ -65,12 +65,26 @@ public class ItemThrower : MonoBehaviour
 
     void ThrowItem()
     {
+        CameraShake.Shake(0.05f, 0.15f);
+
+
         PlayerActionMove.currentMana -= 5f;
         if (itemPrefabs.Length == 0) return;
 
         GameObject itemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
         GameObject item = Instantiate(itemPrefab, throwOrigin.position, Quaternion.identity);
 
+
+        iTween.ScaleFrom(item, iTween.Hash(
+            "scale", Vector3.zero,
+            "time", 0.5f,
+            "easetype", iTween.EaseType.easeOutBack
+        ));
+        iTween.PunchPosition(transform.gameObject, iTween.Hash(
+            "amount", new Vector3(-2f * Mathf.Sign(transform.localScale.x), 0f, 0f),
+            "time", 0.2f,
+            "easetype", iTween.EaseType.easeOutQuad
+        ));
         Vector2 direction;
 
         if (useController)

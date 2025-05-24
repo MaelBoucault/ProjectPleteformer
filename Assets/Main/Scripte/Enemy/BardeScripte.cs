@@ -7,7 +7,7 @@ public class BardeScripte : MonoBehaviour
     public float soinRange = 5f;
     public float healAmount = 5f;
     public float healInterval = 1f;
-    public GameObject healEffectPrefab;
+    public GameObject healProjectilePrefab;
 
     public GameObject Aurra;
     public GameObject BigAurra;
@@ -19,7 +19,7 @@ public class BardeScripte : MonoBehaviour
     {
         BigAurra.SetActive(false);
         SpriteRendererAurra = Aurra.GetComponent<SpriteRenderer>();
-        SetAuraAlpha(0.5f); // Valeur par défaut
+        SetAuraAlpha(0.5f);
         StartCoroutine(HealingLoop());
     }
 
@@ -38,20 +38,22 @@ public class BardeScripte : MonoBehaviour
                     EnnemieHealth ennemi = col.GetComponent<EnnemieHealth>();
                     if (ennemi != null && ennemi.health < ennemi.maxHealth)
                     {
-                        // Appliquer le soin
                         ennemi.UpdateHealth(healAmount);
                         healedSomeone = true;
 
-                        // FX de soin
-                        if (healEffectPrefab != null)
+                        if (healProjectilePrefab != null)
                         {
-                            Instantiate(healEffectPrefab, col.transform.position, Quaternion.identity);
+                            GameObject proj = Instantiate(healProjectilePrefab, transform.position, Quaternion.identity);
+                            HealProjectile projectile = proj.GetComponent<HealProjectile>();
+                            if (projectile != null)
+                            {
+                                projectile.SetTarget(col.transform.position);
+                            }
                         }
                     }
                 }
             }
 
-            // Affichage des auras
             if (healedSomeone)
             {
                 if (!isHealing)

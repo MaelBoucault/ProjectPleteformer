@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 63cd91668d341eb48ab402dfe740402b
+guid: a43b9746168983e4e9780aa23a5577d5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6072606762121425574
-    second: 6201afded02e451b844f0a827a5b95abegYmU0xsQl2JKtLT-4_0
+      213: -1885133625898387220
+    second: EnnemiAurra_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 6201afded02e451b844f0a827a5b95abegYmU0xsQl2JKtLT-4_0
+      name: EnnemiAurra_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 16
-        width: 442
-        height: 477
+        x: 174
+        y: 0
+        width: 329
+        height: 471
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a5d0e1be254c9bba0800000000000000
-      internalID: -6072606762121425574
+      spriteID: ce8be2284f8a6d5e0800000000000000
+      internalID: -1885133625898387220
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      6201afded02e451b844f0a827a5b95abegYmU0xsQl2JKtLT-4_0: -6072606762121425574
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

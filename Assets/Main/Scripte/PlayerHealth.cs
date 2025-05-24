@@ -28,9 +28,6 @@ public class PlayerHealth : MonoBehaviour
     public float invincibilityTime = 1f;
     SpriteRenderer playerRenderer;
 
-    [Header("UI Vignette")]
-    public Image DamageVignette;
-
     [Header("Post-Process")]
     public Volume postProcessVolume;
     private Vignette vignette;

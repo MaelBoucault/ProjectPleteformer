@@ -16,8 +16,10 @@ public class ItemThrower : MonoBehaviour
     private bool isShooting = false;
     private Coroutine shootCoroutine;
 
-
     public GameObject PauseSrciptCanvas;
+
+    private float attackCooldown = 0.5f; // 2 attaques max/sec = 0.5 sec entre chaque
+    private float lastAttackTime = -999f;
 
     private void Start()
     {
@@ -53,43 +55,55 @@ public class ItemThrower : MonoBehaviour
     {
         while (isShooting)
         {
-            if (PlayerActionMove.currentMana >= 10f)
+            if (Time.time - lastAttackTime >= attackCooldown && PlayerActionMove.currentMana >= 10f)
             {
                 Animator.SetBool("Attack", true);
-                ThrowItem();
+                StartCoroutine(RestartBoolAttack());
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
         }
+    }
+
+    IEnumerator RestartBoolAttack()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Animator.SetBool("Attack", false);
     }
 
     void ThrowItem()
     {
+        if (Time.time - lastAttackTime < attackCooldown)
+        {
+            return;
+        }
+
+        lastAttackTime = Time.time;
+
         CameraShake.Shake(0.05f, 0.15f);
-
-
         PlayerActionMove.currentMana -= 5f;
+
         if (itemPrefabs.Length == 0) return;
 
         GameObject itemPrefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
         GameObject item = Instantiate(itemPrefab, throwOrigin.position, Quaternion.identity);
-
 
         iTween.ScaleFrom(item, iTween.Hash(
             "scale", Vector3.zero,
             "time", 0.5f,
             "easetype", iTween.EaseType.easeOutBack
         ));
-        iTween.PunchPosition(transform.gameObject, iTween.Hash(
+
+        iTween.PunchPosition(gameObject, iTween.Hash(
             "amount", new Vector3(-2f * Mathf.Sign(transform.localScale.x), 0f, 0f),
             "time", 0.2f,
             "easetype", iTween.EaseType.easeOutQuad
         ));
+
         Vector2 direction;
 
         if (useController)
         {
-            // Visée avec le stick gauche
             float aimX = Input.GetAxis("Horizontal");
             float aimY = Input.GetAxis("Vertical");
             direction = new Vector2(aimX, aimY);
@@ -101,14 +115,12 @@ public class ItemThrower : MonoBehaviour
         }
         else
         {
-            // Visée souris
             Vector3 mouseScreenPos = Input.mousePosition;
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(
                 new Vector3(mouseScreenPos.x, mouseScreenPos.y, Camera.main.nearClipPlane));
             direction = (mouseWorldPos - throwOrigin.position).normalized;
         }
 
-        // Flip du sprite
         if (direction.x > 0)
             transform.localScale = new Vector3(0.5f, 0.5f, 1);
         else if (direction.x < 0)
@@ -120,14 +132,5 @@ public class ItemThrower : MonoBehaviour
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         item.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
-
-        StartCoroutine(RestartBoolAttack());
     }
-
-    IEnumerator RestartBoolAttack()
-    {
-        yield return new WaitForSeconds(0.1f);
-        Animator.SetBool("Attack", false);
-    }
-
 }

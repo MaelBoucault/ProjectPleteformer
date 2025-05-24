@@ -3,13 +3,29 @@ using System.Collections;
 
 public class FlyingEyeController : MonoBehaviour
 {
+    [Header("Déplacement")]
     public float wanderRadius = 4f;
     public float moveSpeed = 2f;
+
+    [Header("Détection & Attaque")]
     public float detectionRadius = 6f;
     public float attackCooldown = 2f;
+
+    [Header("Références de Prefabs")]
     public GameObject rayPrefab;
     public GameObject magicParticles;
+    public GameObject chargingWavePrefab;
+
+    [Header("Cible")]
     public Transform target;
+
+    [Header("Rayon")]
+    public float rotationLerpSpeed = 5f;
+    public float lengthLerpSpeed = 5f;
+    public float targetRayLength = 100f;
+
+    [Header("Rotation de base")]
+    public float baseRotationOffset = 180f;
 
     private Vector3 startPos;
     private Vector3 wanderTarget;
@@ -18,14 +34,8 @@ public class FlyingEyeController : MonoBehaviour
     private Rigidbody2D rb;
     private GameObject activeRay = null;
 
-    public float rotationLerpSpeed = 5f;
-    public float lengthLerpSpeed = 5f;
-
     private Quaternion currentRayRotation;
     private float currentRayLength = 0f;
-    private float targetRayLength = 100f;
-
-    private float baseRotationOffset = 180f; // L'offset pour que l'œil regarde à gauche par défaut
 
     void Start()
     {
@@ -43,16 +53,8 @@ public class FlyingEyeController : MonoBehaviour
             TryAttack();
         }
 
-        if (activeRay != null && target != null)
+        if (activeRay != null)
         {
-            Vector2 dir = (target.position - transform.position).normalized;
-            float desiredAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            Quaternion desiredRotation = Quaternion.Euler(0f, 0f, desiredAngle);
-
-            currentRayRotation = Quaternion.Slerp(currentRayRotation, desiredRotation, Time.deltaTime * rotationLerpSpeed);
-            activeRay.transform.rotation = currentRayRotation;
-
-            currentRayLength = Mathf.Lerp(currentRayLength, targetRayLength, Time.deltaTime * lengthLerpSpeed);
             activeRay.transform.position = transform.position;
         }
     }
@@ -65,11 +67,8 @@ public class FlyingEyeController : MonoBehaviour
         }
 
         Vector3 dir = (wanderTarget - transform.position).normalized;
-
-        // Déplacement
         rb.MovePosition(transform.position + dir * moveSpeed * Time.deltaTime);
 
-        // Rotation : faire en sorte que l'œil regarde dans la direction du déplacement
         if (dir != Vector3.zero)
         {
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + baseRotationOffset;
@@ -90,9 +89,56 @@ public class FlyingEyeController : MonoBehaviour
         if (Time.time - lastAttackTime >= attackCooldown && activeRay == null)
         {
             lastAttackTime = Time.time;
-            LookAtTarget();  // Faire en sorte que l'œil regarde le joueur avant de tirer
-            FireRay();
+            StartCoroutine(ChargeAndFire());
         }
+    }
+
+    IEnumerator ChargeAndFire()
+    {
+        if (target == null) yield break;
+
+        LookAtTarget();
+
+        GameObject wave = null;
+        float chargeTime = 2.5f;
+
+        if (chargingWavePrefab != null)
+        {
+            wave = Instantiate(chargingWavePrefab, transform.position, Quaternion.identity);
+            wave.transform.localScale = Vector3.one * 2f;
+            wave.transform.SetParent(transform);
+
+            // Tourne pendant 2.5s (on garde iTween ici)
+            iTween.RotateBy(wave, iTween.Hash("z", 2f, "time", chargeTime, "easetype", "linear"));
+
+            // Déplacement subtil
+            iTween.MoveBy(wave, iTween.Hash(
+                "x", 0.05f, "y", 0.05f,
+                "time", chargeTime,
+                "islocal", true,
+                "easetype", "easeInOutSine"
+            ));
+
+            // Shrink manuellement
+            Vector3 initialScale = wave.transform.localScale;
+            float elapsed = 0f;
+
+            while (elapsed < chargeTime)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / chargeTime;
+                wave.transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, Mathf.Pow(t, 2)); // easeIn
+                yield return null;
+            }
+
+            Destroy(wave);
+        }
+        else
+        {
+            yield return new WaitForSeconds(chargeTime);
+        }
+
+        FireRay();
     }
 
     void LookAtTarget()
@@ -100,11 +146,12 @@ public class FlyingEyeController : MonoBehaviour
         if (target != null)
         {
             Vector2 dir = (target.position - transform.position).normalized;
-            // Calculer l'angle nécessaire pour que l'œil regarde la cible
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + baseRotationOffset;
-            Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
 
-            // Rotation lissée
+            float baseAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            float randomOffset = Random.Range(-5f, 5f);
+            float finalAngle = baseAngle + randomOffset + baseRotationOffset;
+
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, finalAngle);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
         }
     }
@@ -115,18 +162,13 @@ public class FlyingEyeController : MonoBehaviour
         {
             Vector2 dir = (target.position - transform.position).normalized;
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            float randomOffset = Random.Range(15f, 30f);
+            angle += randomOffset;
+
             Quaternion rayRotation = Quaternion.Euler(0f, 0f, angle);
 
             activeRay = Instantiate(rayPrefab, transform.position, rayRotation);
             activeRay.transform.parent = transform;
-
-            if (magicParticles != null)
-                Instantiate(magicParticles, transform.position, Quaternion.identity);
-
-            currentRayRotation = rayRotation;
-            currentRayLength = 0f;
-
-            //StartCoroutine(DestroyRayAfterSeconds(3f));
         }
         else
         {

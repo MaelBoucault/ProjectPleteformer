@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using Unity.VisualScripting;
 
 public class EnfantScript : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class EnfantScript : MonoBehaviour
 
     void Start()
     {
+        player = FindAnyObjectByType<PlayerActionMove>().transform;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -109,10 +111,21 @@ public class EnfantScript : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "Player" && !hasDamaged)
+        // Collision avec le joueur
+        if (collision.gameObject.CompareTag("Player") && !hasDamaged)
         {
-            collision.gameObject.GetComponent<PlayerHealth>().UpdateHealth(-15,gameObject.transform.position);
+            collision.gameObject.GetComponent<PlayerHealth>().UpdateHealth(-15, transform.position);
             hasDamaged = true;
+        }
+
+        if (collision.gameObject.GetComponent<ProjectilScript>() != null)
+        {
+            targetPosition = player.position;
+            isChasing = true;
+            chaseTimer = 0f;
+
+            // Facultatif : effet visuel ou animation de réaction
+            Aurra.SetActive(true);
         }
     }
 

@@ -1,14 +1,9 @@
-using UnityEngine;
-using UnityEngine.InputSystem.Processors;
-using UnityEngine.Rendering;
+﻿using UnityEngine;
 using System.Collections;
-
-
 public class EnnemieHealth : MonoBehaviour
 {
     public float health;
     public float maxHealth;
-
     public bool invincibility;
     public float invincibilityTime = 0.3f;
 
@@ -16,17 +11,28 @@ public class EnnemieHealth : MonoBehaviour
     SpriteRenderer EnnemieRenderer;
 
     [Header("Itween")]
-    public Vector3 amount = new Vector3 (0.5f,0.2f,0);
+    public Vector3 amount = new Vector3(0.5f, 0.2f, 0);
     public float time = 0.5f;
 
+    public GameObject GameObjectSpriterenderer;
+
+    [Header("Spécifique au barde")]
+    public bool isBarde = false; // 👈 Ajout de ce bool
 
     private void Start()
     {
-        EnnemieRenderer = GetComponent<SpriteRenderer>();
+        if (gameObject.GetComponent<SpriteRenderer>())
+        {
+            EnnemieRenderer = gameObject.GetComponent<SpriteRenderer>();
+        }
+        else if (GameObjectSpriterenderer != null) 
+        {
+            EnnemieRenderer = GameObjectSpriterenderer.GetComponent<SpriteRenderer>();
+        }
+        
     }
 
-
-    public void UpdateHealth( float Amount)
+    public void UpdateHealth(float Amount)
     {
         if (!invincibility)
         {
@@ -42,15 +48,15 @@ public class EnnemieHealth : MonoBehaviour
             StartCoroutine(InvincibilityCoroutine());
         }
 
-        if (health >= maxHealth)
-        {
-            health = maxHealth;
-        }
+        if (health >= maxHealth) health = maxHealth;
+        if (health <= 0) health = 0;
 
         if (health <= 0)
         {
-            health = 0;
-            Dead();
+            if (!isBarde) // 👈 NE PAS détruire si c’est le barde
+            {
+                Dead();
+            }
         }
     }
 

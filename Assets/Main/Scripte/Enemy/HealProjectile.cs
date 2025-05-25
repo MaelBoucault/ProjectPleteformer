@@ -1,37 +1,48 @@
+﻿using Unity.VisualScripting;
 using UnityEngine;
 
 public class HealProjectile : MonoBehaviour
 {
-    public Vector3 target;
     public float speed = 10f;
-    public GameObject impactEffect;
+    private Vector3 targetPosition;
+    private Transform targetTransform;
+    private bool hasReachedTarget = false;
 
-    void Update()
+    public void SetTarget(Vector3 position, Transform target = null)
     {
-        if (target == null) return;
+        targetPosition = position;
+        targetTransform = target;
+    }
 
-        Vector3 direction = target - transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+    private void Update()
+    {
+        if (hasReachedTarget) return;
 
-        if (direction != Vector3.zero)
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        }
+            hasReachedTarget = true;
 
-        if (Vector3.Distance(transform.position, target) < 0.1f)
-        {
-            if (impactEffect != null)
+            if (targetTransform != null)
             {
-                Instantiate(impactEffect, transform.position, Quaternion.identity);
+                transform.SetParent(targetTransform);
+                transform.localPosition = Vector3.zero;
             }
 
             Destroy(gameObject);
         }
     }
 
-    public void SetTarget(Vector3 targetPosition)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        target = targetPosition;
+        if (collision.gameObject.GetComponent<Scriptmorve>() == true)
+        {
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.tag == "Player")
+        {
+            collision.gameObject.GetComponent<PlayerHealth>().UpdateHealth(-20,transform.position);
+        }
     }
 }

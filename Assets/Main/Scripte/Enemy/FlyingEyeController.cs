@@ -39,6 +39,8 @@ public class FlyingEyeController : MonoBehaviour
 
     void Start()
     {
+
+        target = FindAnyObjectByType<PlayerActionMove>().transform;
         startPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
         PickNewWanderTarget();

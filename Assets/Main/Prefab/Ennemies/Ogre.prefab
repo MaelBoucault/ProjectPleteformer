@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3261512580285368368}
   m_Layer: 0
-  m_Name: EnnemiePrefab
+  m_Name: Ogre
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -11,6 +11,15 @@ public class EnemyAI2D : MonoBehaviour
     public float detectionRange = 5f;
     public float stopChaseRange = 8f;
 
+    public float idleTime = 1f;
+    private float idleTimer = 0f;
+    private bool isIdling = false;
+
+    public float attackRange = 1f;
+    public LayerMask playerLayer;
+    public float dashForce = 8f;
+    public float dashDuration = 0.2f;
+
     private Transform currentTarget;
     internal bool chasing = false;
     private Rigidbody2D rb;
@@ -18,15 +27,12 @@ public class EnemyAI2D : MonoBehaviour
     public GameObject Aurra;
 
     Animator animator;
-
     internal Vector2 direction = Vector2.zero;
-    
-
     internal bool Attack;
-
 
     void Start()
     {
+        player = FindAnyObjectByType<PlayerActionMove>().transform;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         currentTarget = pointB;
@@ -35,7 +41,7 @@ public class EnemyAI2D : MonoBehaviour
 
     void FixedUpdate()
     {
-
+        transform.localScale = new Vector3(0.5f, 0.5f, 1);
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
         if (distanceToPlayer < detectionRange)
@@ -49,45 +55,88 @@ public class EnemyAI2D : MonoBehaviour
             Aurra.SetActive(false);
         }
 
-        if (chasing)
+        if (!Attack)
         {
-            MoveTowards(player.position);
-        }
-        else
-        {
-            Patrol();
+            if (chasing)
+            {
+                MoveTowards(player.position);
+            }
+            else
+            {
+                Patrol();
+            }
         }
 
+        CheckAttack();
         ApplySquashAndStretch();
     }
 
     void Patrol()
     {
-        MoveTowards(currentTarget.position);
+        if (isIdling)
+        {
+            idleTimer -= Time.fixedDeltaTime;
+            if (idleTimer <= 0f)
+            {
+                isIdling = false;
+                currentTarget = currentTarget == pointA ? pointB : pointA;
+            }
+            return;
+        }
 
+        MoveTowards(currentTarget.position);
 
         if (Vector2.Distance(transform.position, currentTarget.position) < 0.5f)
         {
-            currentTarget = currentTarget == pointA ? pointB : pointA;
+            isIdling = true;
+            idleTimer = idleTime;
+            animator.SetFloat("Speed", 0);
+            rb.linearVelocity = new Vector3(0, 0, 0);
         }
     }
 
     void MoveTowards(Vector2 target)
     {
-        if (!Attack)
+        Vector2 currentPosition = rb.position;
+        Vector2 targetPosition = new Vector2(target.x, currentPosition.y);
+        direction = (targetPosition - currentPosition).normalized;
+
+        animator.SetFloat("Speed", Math.Abs(direction.x));
+
+        Vector2 desiredVelocity = direction * speed;
+        rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, desiredVelocity, 0.1f);
+
+        FlipSprite(direction.x);
+    }
+
+    void CheckAttack()
+    {
+        if (chasing)
         {
-            Vector2 currentPosition = rb.position;
-            Vector2 targetPosition = new Vector2(target.x, currentPosition.y);
-            direction = (targetPosition - currentPosition).normalized;
-
-            animator.SetFloat("Speed", Math.Abs(direction.x));
-
-            Vector2 desiredVelocity = direction * speed;
-            rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, desiredVelocity, 0.1f);
-
-            FlipSprite(direction.x);
+            Collider2D hit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
+            if (hit != null && !Attack)
+            {
+                StartCoroutine(DashTowardsPlayer());
+            }
         }
-        
+    }
+
+    System.Collections.IEnumerator DashTowardsPlayer()
+    {
+        Attack = true;
+        animator.SetTrigger("Attack");
+
+        Vector3 targetPos = player.position;
+        iTween.MoveTo(gameObject, iTween.Hash(
+            "position", new Vector3(targetPos.x, transform.position.y, transform.position.z),
+            "speed", dashForce,
+            "easetype", iTween.EaseType.easeInOutSine,
+            "time", dashDuration
+        ));
+
+        yield return new WaitForSeconds(dashDuration + 0.1f);
+
+        Attack = false;
     }
 
     void FlipSprite(float directionX)
@@ -112,4 +161,10 @@ public class EnemyAI2D : MonoBehaviour
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, 0.1f);
     }
 
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
 }

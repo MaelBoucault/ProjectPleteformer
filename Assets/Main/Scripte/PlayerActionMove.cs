@@ -153,7 +153,7 @@ public class PlayerActionMove : MonoBehaviour
             CameraShake.Shake(0.1f, 0.15f);
             iTween.ScaleFrom(pilier, iTween.Hash(
                 "scale", new Vector3(0.1f, 0.1f, 0.1f),
-                "time", 0.3f,
+                "time", 1f,
                 "easetype", iTween.EaseType.easeOutBack
             ));
 

@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 8930189624709395347}
   - component: {fileID: 8354479402499077172}
   - component: {fileID: 3654295303723504177}
+  - component: {fileID: -6630097365755073462}
   - component: {fileID: -8459368218930509159}
   - component: {fileID: 1740038163449022589}
-  - component: {fileID: -6630097365755073462}
   m_Layer: 3
   m_Name: Pilier
   m_TagString: Untagged
@@ -107,6 +107,19 @@ MonoBehaviour:
   BaseColor: {r: 0, g: 0, b: 0, a: 0}
   ColorMorve: {r: 0.9137255, g: 0.93333334, b: 0.22352941, a: 1}
   IsMorve: 1
+--- !u!114 &-6630097365755073462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8208074370986629515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e129421bda8c4b14682c98365f3c7872, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MorveEnfant: {fileID: 8208074370986629515}
 --- !u!114 &-8459368218930509159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,16 +179,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 5.12, y: 5.12}
   m_EdgeRadius: 0
---- !u!114 &-6630097365755073462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8208074370986629515}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e129421bda8c4b14682c98365f3c7872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MorveEnfant: {fileID: 8208074370986629515}

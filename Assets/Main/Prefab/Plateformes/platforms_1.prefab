@@ -160,7 +160,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1013180238172924967}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sol (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4568858718372088808}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sol (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1285,7 +1285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8225019336775540850}
   - component: {fileID: 2557567708008761702}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: platforms_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1374,7 +1374,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6676649560013721580}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sol (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -132,7 +132,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.31}
   m_Size: {x: 4.81, y: 5.08}
   m_Direction: 0
 --- !u!61 &2326623427132315323
@@ -250,14 +250,17 @@ MonoBehaviour:
   dashForce: 25
   dashDuration: 0.3
   dashCooldown: 0.5
-  dashManaCost: 10
+  NbDash: 3
+  NbDashCurl: 3
+  CanDash: 0
+  IsDashing: 0
   maxMana: 100
   manaRegenRate: 50
   currentMana: 100
-  PilierPrefab: {fileID: 8208074370986629515, guid: 5f32e66721dc8e743a57f055e602f469, type: 3}
   Pilier: 3
   PilierMax: 3
   PilierTxt: {fileID: 0}
+  PilierPrefab: {fileID: 8208074370986629515, guid: 5f32e66721dc8e743a57f055e602f469, type: 3}
   CirclePrefab: {fileID: 5339295563206833275, guid: 4002446e5abf8ba4793ee7621752777f, type: 3}
   Morve: {fileID: 0}
 --- !u!114 &4365305281124428225

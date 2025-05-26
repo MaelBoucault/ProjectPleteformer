@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,54 +8,69 @@ using UnityEngine.UI;
 public class PlayerActionMove : MonoBehaviour
 {
     [Header("Dash Settings")]
-    public float dashForce;
+    public float dashForce = 0f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 0.5f;
-    public float dashManaCost = 5f;
+    public int NbDash = 3;
+    public int NbDashCurl = 3;
+    public bool CanDash = false;
+
 
     [Header("Mana Settings")]
     public float maxMana = 150f;
     public float manaRegenRate = 10f;
-
     public float currentMana;
 
-    private Rigidbody2D rb;
-    private bool isDashing = false;
-    private float dashTimer;
-    private float cooldownTimer;
-
-    private Vector2 dashDirection;
-
-    public bool IsDashing => isDashing;
-
-    public GameObject PilierPrefab;
+    [Header("Pilier Settings")]
     public int Pilier = 2;
     public int PilierMax = 2;
     public Text PilierTxt;
+    public GameObject PilierPrefab;
+
+    [Header("Prefabs instance")]
     public GameObject CirclePrefab;
-
-
-    internal bool CanDash = false;
-    private bool isRegeneratingMana = false;
-
-    private PlayerMovement PlayerMovementScript;
-
     public GameObject Morve;
 
+
+    // Private/Internal Variables
+    private Rigidbody2D rb;
+    internal bool isDashing = false;
+    private float dashTimer;
+    private float cooldownTimer;
+    private Vector2 dashDirection;
+    private bool isRegeneratingMana = false;
+
+    private bool IsMorve = false;
+    private bool IsInstancingPilier = false;
+
+    private PlayerMovement PlayerMovementScript;
     private Animator Animator;
+
+    private float horizontal;
+    private float vertical;
+
 
     void Awake()
     {
+        NbDashCurl = NbDash;
         Animator = GetComponent<Animator>();
         PlayerMovementScript = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
         currentMana = maxMana;
-
     }
 
     void Update()
     {
-        
+        if (isDashing)
+        {
+            rb.linearVelocity = dashDirection * dashForce;
+        }
+
+        horizontal = Input.GetAxisRaw("Horizontal");
+        vertical = Input.GetAxisRaw("Vertical");
+
+        CanDash = cooldownTimer <= 0 && !isDashing && (NbDashCurl > 0);
+
 
         PilierTxt.text = Pilier.ToString();
 
@@ -63,7 +79,7 @@ public class PlayerActionMove : MonoBehaviour
         if (cooldownTimer > 0)
             cooldownTimer -= Time.deltaTime;
 
-        if (CanDash && Input.GetKeyDown(KeyCode.LeftShift) && cooldownTimer <= 0 && !isDashing && currentMana >= dashManaCost)
+        if (CanDash && (Input.GetKeyDown(KeyCode.LeftShift)))
         {
             StartDash();
         }
@@ -79,118 +95,106 @@ public class PlayerActionMove : MonoBehaviour
 
         Morve.SetActive(CanDash);
 
-    }
+        //Pilier
+        if (Input.GetKeyDown(KeyCode.Q)){
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.GetComponent<Scriptmorve>())
-        {
-            CanDash = true;
-            if (!collision.GetComponent<Pilier>())
-                Pilier = PilierMax;
-            
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.GetComponent<Scriptmorve>())
-        {
-            if (gameObject.activeInHierarchy)
+            if (PilierPrefab != null && Pilier > 0 && !IsInstancingPilier)
             {
-                StartCoroutine(ResetCanDash());
+                IsInstancingPilier = true;
+                Pilier--;
+
+                dashDirection = new Vector2(horizontal, vertical).normalized;
+
+                rb.linearVelocity = dashDirection * (dashForce + 10f);
+
+                GameObject pilier = Instantiate(PilierPrefab, transform.position - new Vector3(0, 5, 0), Quaternion.identity);
+                pilier.GetComponent<Pilier>().SetTarget(gameObject.GetComponent<PlayerMovement>().groundCheck.position);
+                dashForce = 20f;
+                CameraShake.Shake(0.1f, 0.15f);
+                iTween.ScaleFrom(pilier, iTween.Hash(
+                    "scale", new Vector3(0.5f, 0.5f, 0.5f),
+                    "time", 1f,
+                    "easetype", iTween.EaseType.easeOutBack
+                ));
+                StartCoroutine(ResetPilier());
             }
         }
+
+        //Charge Au Sol
+        if (Input.GetKeyDown(KeyCode.S) && !PlayerMovementScript.isGrounded)
+        {
+            dashDirection = new Vector2(horizontal, vertical).normalized;
+
+            rb.linearVelocity = dashDirection * dashForce * 0.75f;
+
+            Vector3 rayOrigin = transform.position - new Vector3(0, 2.5f, 0);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 10f);
+
+            if (hit.collider != null)
+
+
+                if (hit.collider.gameObject.layer == 3)
+                {
+                    Vector3 spawnPosition = hit.point;
+
+                    GameObject shockwave = Instantiate(CirclePrefab, spawnPosition, Quaternion.identity);
+
+                    Shockwave shockwaveScript = shockwave.GetComponent<Shockwave>();
+                    if (shockwaveScript != null)
+                    {
+                        shockwaveScript.damage = 15f;
+                        shockwaveScript.radius = 5f;
+                        shockwaveScript.lifetime = 1f;
+                    }
+
+                    iTween.ScaleFrom(shockwave, iTween.Hash(
+                        "scale", new Vector3(15f, 15f, 15f),
+                        "time", 0.3f,
+                        "easetype", iTween.EaseType.easeOutExpo
+                    ));
+                }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == 3) NbDashCurl = NbDash;
+
+        if (collision.GetComponent<Scriptmorve>())
+        {
+            if (!collision.GetComponent<Pilier>() && !IsInstancingPilier)
+                Pilier = PilierMax;
+        }
+
+        
     }
 
 
     void StartDash()
     {
-        isDashing = true;
+
+        NbDashCurl--;
         dashTimer = dashDuration;
         cooldownTimer = dashCooldown;
 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-
         dashDirection = new Vector2(horizontal, vertical).normalized;
-
         if (dashDirection == Vector2.zero)
             dashDirection = new Vector2(transform.localScale.x, 0).normalized;
 
-        if (dashDirection == Vector2.down && CirclePrefab != null)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 10f);
+        if (IsMorve) dashForce = 30f;
+        else if (dashForce == 0f) dashForce = 20f; // valeur par défaut
 
-            if (hit.collider != null)
-            {
-                Vector3 spawnPosition = hit.point;
-
-                GameObject shockwave = Instantiate(CirclePrefab, spawnPosition, Quaternion.identity);
-                Shockwave shockwaveScript = shockwave.GetComponent<Shockwave>();
-
-                if (shockwaveScript != null)
-                {
-                    shockwaveScript.damage = 10f;
-                    shockwaveScript.radius = 5f;
-                    shockwaveScript.lifetime = 1f;
-                }
-
-                iTween.ScaleFrom(shockwave, iTween.Hash(
-                    "scale", new Vector3(0.1f, 0.1f, 0.1f),
-                    "time", 0.2f,
-                    "easetype", iTween.EaseType.easeOutExpo
-                ));
-            }
-        }
-
-        if ((vertical > 0.1f && horizontal == 0) && PilierPrefab != null && Pilier > 0)
-        {
-            StartCoroutine(DepancePilier());
-
-            GameObject pilier = Instantiate(PilierPrefab, transform.position - new Vector3 (0,5,0), Quaternion.identity);
-            pilier.GetComponent<Pilier>().SetTarget(gameObject.GetComponent<PlayerMovement>().groundCheck.position);
-            dashForce = 20f;
-            CameraShake.Shake(0.1f, 0.15f);
-            iTween.ScaleFrom(pilier, iTween.Hash(
-                "scale", new Vector3(0.1f, 0.1f, 0.1f),
-                "time", 1f,
-                "easetype", iTween.EaseType.easeOutBack
-            ));
-
-        }
-        if ((vertical == 0 && horizontal >= 0.1f) && GetComponent<PlayerMovement>().isGrounded)
-        {
-            
-            dashForce = 28f;
-            CameraShake.Shake(0.2f, 0.3f);
-        }
-        else if (!(GetComponent<PlayerMovement>().isGrounded))
-        {
-            dashForce = 25f;
-            CameraShake.Shake(0.15f, 0.2f);
-            
-        }
-        else
-        {
-            CameraShake.Shake(0.15f, 0.2f);
-            
-        }
-
-        if ( !(Math.Abs(vertical) > 0.1f && horizontal == 0))
+        if (Math.Abs(dashDirection.x) > 0)
             Animator.SetBool("IsDashHorizontal", true);
 
-        rb.linearVelocity = dashDirection * dashForce;
-        
-
-        GameObject visual = transform.gameObject;
-
-        iTween.PunchPosition(visual, iTween.Hash(
+        iTween.PunchPosition(gameObject, iTween.Hash(
             "amount", new Vector3(dashDirection.x, dashDirection.y, 0) * 1.2f,
             "time", 0.3f,
             "easetype", iTween.EaseType.easeOutQuad
         ));
-
+        isDashing = true;
     }
+
 
 
 
@@ -198,7 +202,7 @@ public class PlayerActionMove : MonoBehaviour
     {
         isDashing = false;
         rb.linearVelocity = Vector2.zero;
-        Animator.SetBool("IsDashHorizontal", IsDashing);
+        Animator.SetBool("IsDashHorizontal", isDashing);
 
     }
 
@@ -206,18 +210,18 @@ public class PlayerActionMove : MonoBehaviour
     {
         if (!isDashing && currentMana < maxMana && !isRegeneratingMana)
         {
-            StartCoroutine(RechargeManaDash());
+            StartCoroutine(RechargeManaTire());
         }
     }
 
 
-    IEnumerator RechargeManaDash()
+    IEnumerator RechargeManaTire()
     {
         isRegeneratingMana = true;
 
-        while (currentMana < maxMana && !isDashing)
+        while (currentMana < maxMana)
         {
-            yield return new WaitForSeconds(2f); // Recharge toutes les 2 secondes
+            yield return new WaitForSeconds(2f);
 
             currentMana += manaRegenRate;
             currentMana = Mathf.Min(currentMana, maxMana);
@@ -227,16 +231,9 @@ public class PlayerActionMove : MonoBehaviour
         isRegeneratingMana = false;
     }
 
-    IEnumerator DepancePilier()
+    IEnumerator ResetPilier()
     {
         yield return new WaitForSeconds(0.2f);
-        Pilier--;
-    }
-
-
-    IEnumerator ResetCanDash()
-    {
-        yield return new WaitForSeconds(5f);
-        CanDash = false;
+        IsInstancingPilier = false;
     }
 }

@@ -71,8 +71,8 @@ public class EnnemieHealth : MonoBehaviour
 
         float elapsedTime = 0f;
         Color originalColor = EnnemieRenderer.color;
-        Color transparentColor = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
-
+        Color transparentColor = Color.magenta;
+        transparentColor.a = .5f;
         while (elapsedTime < invincibilityTime)
         {
             float lerp = Mathf.PingPong(Time.time * 5, 1);

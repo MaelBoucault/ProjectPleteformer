@@ -48,8 +48,7 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleJumpMana();
 
-        if (dashScript != null && dashScript.IsDashing)
-            return;
+        if (dashScript.isDashing) return;
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);

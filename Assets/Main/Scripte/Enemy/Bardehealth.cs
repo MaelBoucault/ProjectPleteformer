@@ -13,6 +13,7 @@ public class BardeHealth : MonoBehaviour
     public GameObject AurraToExplode;
     public float explosionScale = 3f;
     public float explosionTime = 0.5f;
+    public GameObject Sprite;
 
     private EnnemieHealth ennemieHealth;
     private bool hasDied = false;
@@ -24,19 +25,17 @@ public class BardeHealth : MonoBehaviour
         ennemieHealth = GetComponent<EnnemieHealth>();
         if (ennemieHealth == null)
         {
-            Debug.LogError("BardeHealth : Aucun EnnemieHealth trouvé sur ce GameObject.");
             enabled = false;
             return;
         }
 
-        UpdateUI(); // Initialisation
+        UpdateUI();
     }
 
     private void Update()
     {
         if (ennemieHealth == null) return;
 
-        // ⚠️ Détection de la mort du barde
         if (!hasDied && ennemieHealth.health <= 0f)
         {
             hasDied = true;
@@ -79,6 +78,14 @@ public class BardeHealth : MonoBehaviour
 
         if (AurraToExplode == null) return;
 
+        //Extention en y
+        iTween.ScaleTo(Sprite, iTween.Hash(
+            "scale", new Vector3 (0.1f,0.3f,0),
+            "time", explosionTime * 0.5f,
+            "easetype", iTween.EaseType.easeOutBack
+        ));
+
+
         // Première phase : petite expansion rapide
         iTween.ScaleTo(AurraToExplode, iTween.Hash(
             "scale", Vector3.one * (explosionScale * 0.5f),
@@ -86,14 +93,21 @@ public class BardeHealth : MonoBehaviour
             "easetype", iTween.EaseType.easeOutBack
         ));
 
-        // Délai avant la deuxième phase
-        Invoke(nameof(TriggerSecondExplosion), 0.1f); // petit temps d'attente entre les deux phases
+        Invoke(nameof(TriggerSecondExplosion), 0.15f);
     }
 
     private void TriggerSecondExplosion()
     {
         if (AurraToExplode == null) return;
 
+        //Extention en x
+        iTween.ScaleTo(AurraToExplode, iTween.Hash(
+            "scale", new Vector3(0.3f, 0.1f, 0),
+            "time", explosionTime * 0.5f,
+            "easetype", iTween.EaseType.easeInOutExpo,
+            "oncomplete", "DestroyAura",
+            "oncompletetarget", gameObject
+        ));
         // Deuxième phase : expansion finale
         iTween.ScaleTo(AurraToExplode, iTween.Hash(
             "scale", Vector3.one * explosionScale,

@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,17 @@ public class CollisionPlayer : MonoBehaviour
         if (collision.gameObject.tag == "Respawn")
         {
             gameObject.transform.position = new Vector3(0,0,0);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+
+            gameObject.transform.position = new Vector3(0, 0, 0);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
 

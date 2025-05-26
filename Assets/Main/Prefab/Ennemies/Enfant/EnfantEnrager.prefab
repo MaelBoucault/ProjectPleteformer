@@ -209,13 +209,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 125b566dafcd08f4394c59d2598f1010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 1000
-  maxHealth: 1000
+  health: 350
+  maxHealth: 350
   invincibility: 0
   invincibilityTime: 0.3
   EnnemiePrefab: {fileID: 9051863612550400635}
   amount: {x: 0, y: 0, z: 0}
   time: 0
+  GameObjectSpriterenderer: {fileID: 0}
+  isBarde: 0
 --- !u!95 &6992931266694952988
 Animator:
   serializedVersion: 7

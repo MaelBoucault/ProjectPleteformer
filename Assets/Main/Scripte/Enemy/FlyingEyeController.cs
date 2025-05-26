@@ -35,7 +35,6 @@ public class FlyingEyeController : MonoBehaviour
     private GameObject activeRay = null;
 
     private Quaternion currentRayRotation;
-    private float currentRayLength = 0f;
 
     void Start()
     {

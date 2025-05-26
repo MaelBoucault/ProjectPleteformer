@@ -63,7 +63,6 @@ public class BardeScripte : MonoBehaviour
 
         if (currentTarget != null)
         {
-            // 🔄 Comportement de soin
             Vector3 directionAwayFromPlayer = (currentTarget.position - player.position).normalized;
             Vector3 targetPosition = currentTarget.position + directionAwayFromPlayer * distanceFromEnemy;
 

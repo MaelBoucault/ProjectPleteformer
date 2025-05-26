@@ -35,7 +35,7 @@ Transform:
   m_GameObject: {fileID: 171417328293343575}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 75.77, y: -0.07, z: 0}
+  m_LocalPosition: {x: -4.5, y: 5.2, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -31686665380501995, guid: 70e0df5a2d3a64343b58f57e42c697c8, type: 3}
+  m_Sprite: {fileID: -3499936183193605678, guid: 1e2f5e2df58f3874e8f99491dfc596be, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -173,7 +173,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 4.81, y: 5.08}
+    oldSize: {x: 4.05, y: 4.91}
     newSize: {x: 4.81, y: 5.08}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -196,7 +196,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2
   m_Material: {fileID: 6200000, guid: 858bd5bd677716c48a2fda8a133efeab, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -220,21 +220,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bebbd53a97ec36249b97d4cdb34dd8c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  jumpForce: 8
+  moveSpeed: 10
+  jumpForce: 15
   coyoteTime: 0.15
   jumpBufferTime: 0.8
   fallMultiplier: 2.5
   lowJumpMultiplier: 2
-  SliderJump: {fileID: 0}
   JumpNbMax: 2
   JumpNb: 0
   Jump: 0
   groundCheck: {fileID: 6486469841503608453}
-  groundCheckRadius: 0.5
+  groundCheckRadius: 1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   animator: {fileID: 4000995869307229325}
 --- !u!114 &72438832327239114
 MonoBehaviour:
@@ -248,14 +247,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe2de8ae49493c49ae0ad7ede9241b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashForce: 20
-  dashDuration: 0.2
+  dashForce: 25
+  dashDuration: 0.3
   dashCooldown: 0.5
-  dashManaCost: 25
+  dashManaCost: 10
   maxMana: 100
-  manaRegenRate: 25
-  slider_mana: {fileID: 0}
-  currentMana: 0
+  manaRegenRate: 50
+  currentMana: 100
   PilierPrefab: {fileID: 8208074370986629515, guid: 5f32e66721dc8e743a57f055e602f469, type: 3}
   Pilier: 3
   PilierMax: 3
@@ -279,6 +277,9 @@ MonoBehaviour:
   SliderHealth: {fileID: 0}
   invincibility: 0
   invincibilityTime: 1
+  postProcessVolume: {fileID: 0}
+  amount: {x: 0.5, y: 0.2, z: 0}
+  time: 0.5
 --- !u!114 &5931720963350407740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,6 +298,8 @@ MonoBehaviour:
   throwOrigin: {fileID: 6672085711544422650}
   throwForce: 50
   Animator: {fileID: 4000995869307229325}
+  useController: 0
+  PauseSrciptCanvas: {fileID: 0}
 --- !u!114 &5062128734055588523
 MonoBehaviour:
   m_ObjectHideFlags: 0

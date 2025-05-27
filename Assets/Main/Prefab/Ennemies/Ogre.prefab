@@ -247,8 +247,8 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 64
-  dashForce: 80
-  dashDuration: 2
+  dashForce: 8
+  dashDuration: 0.8
   groundCheckDistance: 0.2
   groundCheckLeft: {fileID: 8948382625599746047}
   groundCheckRight: {fileID: 8939856222297241059}

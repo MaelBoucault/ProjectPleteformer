@@ -1,16 +1,20 @@
 using UnityEngine;
 
-public class tourniquetScripte : MonoBehaviour
+public class TourniquetScripte : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public Transform[] plateformes;  // Les 4 plateformes à faire tourner
+    public float vitesseRotation = 30f;  // vitesse en degrés par seconde
 
-    // Update is called once per frame
     void Update()
     {
-        
+        // On fait tourner chaque plateforme autour du pivot (this.transform.position)
+        foreach (Transform plateforme in plateformes)
+        {
+            // Faire tourner autour du pivot selon l'axe Z (dans 2D)
+            plateforme.RotateAround(transform.position, Vector3.forward, vitesseRotation * Time.deltaTime);
+
+            // Réinitialiser la rotation de la plateforme pour qu'elle reste droite (rotation nulle)
+            plateforme.rotation = Quaternion.identity;
+        }
     }
 }

@@ -221,7 +221,7 @@ MonoBehaviour:
   wanderRadius: 10
   moveSpeed: 5
   detectionRadius: 15
-  attackCooldown: 2
+  attackCooldown: 5
   rayPrefab: {fileID: 4656140642985556137, guid: 80922f6452e995f4fa7b09c1c3e59f05, type: 3}
   magicParticles: {fileID: 6896764003347309879, guid: 30b7671c716fd0d4ba01bb47d737f468, type: 3}
   chargingWavePrefab: {fileID: 2770098725944473971, guid: 3a7d90e842f361543822c73ebef4ce54, type: 3}
@@ -249,6 +249,8 @@ MonoBehaviour:
   EnnemiePrefab: {fileID: 8236380564786917342}
   amount: {x: 0.5, y: 0.2, z: 0}
   time: 0.5
+  GameObjectSpriterenderer: {fileID: 0}
+  isBarde: 0
 --- !u!61 &2628782794983094813
 BoxCollider2D:
   m_ObjectHideFlags: 0

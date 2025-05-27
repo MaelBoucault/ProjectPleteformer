@@ -29,6 +29,9 @@ public class EnemyAI2D : MonoBehaviour
     public GameObject Aurra;
     public Transform player;
 
+
+    private Transform lastPlatform;
+    private Vector2 lastSafePosition;
     void Start()
     {
         player = FindAnyObjectByType<PlayerActionMove>().transform;
@@ -39,7 +42,12 @@ public class EnemyAI2D : MonoBehaviour
 
     void FixedUpdate()
     {
-        transform.localScale = new Vector3(0.5f * (facingRight ? 1 : -1), 0.5f, 1);
+        if (transform.position.y < -10f)
+        {
+            RespawnToLastPlatform();
+        }
+
+        transform.localScale = new Vector3(0.5f, 0.5f, 1);
 
         if (player != null)
         {
@@ -71,7 +79,21 @@ public class EnemyAI2D : MonoBehaviour
         CheckAttack();
         ApplySquashAndStretch();
     }
-
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == 3)
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                if (contact.normal.y > 0.5f) // L'enfant est AU-DESSUS
+                {
+                    lastPlatform = collision.transform;
+                    lastSafePosition = transform.position;
+                    break;
+                }
+            }
+        }
+    }
     void Patrol()
     {
         bool isGroundedLeft = Physics2D.Raycast(groundCheckLeft.position, Vector2.down, groundCheckDistance, platformLayer);
@@ -89,6 +111,7 @@ public class EnemyAI2D : MonoBehaviour
         direction = new Vector2(facingRight ? 1f : -1f, 0f);
         animator.SetFloat("Speed", Mathf.Abs(direction.x));
         rb.linearVelocity = new Vector2(direction.x * speed, rb.linearVelocity.y);
+        HandleFlip(direction.x);
     }
 
     void MoveTowards(Vector2 target)
@@ -97,30 +120,66 @@ public class EnemyAI2D : MonoBehaviour
         Vector2 targetPosition = new Vector2(target.x, currentPosition.y);
         direction = (targetPosition - currentPosition).normalized;
 
+        bool isGroundedLeft = Physics2D.Raycast(groundCheckLeft.position, Vector2.down, groundCheckDistance, platformLayer);
+        bool isGroundedRight = Physics2D.Raycast(groundCheckRight.position, Vector2.down, groundCheckDistance, platformLayer);
+
+        bool wallLeft = Physics2D.Raycast(wallCheckLeft.position, Vector2.left, 0.1f, platformLayer);
+        bool wallRight = Physics2D.Raycast(wallCheckRight.position, Vector2.right, 0.1f, platformLayer);
+
+        if ((facingRight && (!isGroundedRight || wallRight)) ||
+            (!facingRight && (!isGroundedLeft || wallLeft)))
+        {
+            facingRight = !facingRight;
+        }
+
+        direction = new Vector2(facingRight ? 1f : -1f, 0f);
         animator.SetFloat("Speed", Mathf.Abs(direction.x));
         rb.linearVelocity = new Vector2(direction.x * speed, rb.linearVelocity.y);
 
-        facingRight = direction.x > 0;
+        HandleFlip(direction.x);
     }
 
     void CheckAttack()
     {
-        if (chasing && !Attack)
+        if (chasing)
         {
-            float distance = Vector2.Distance(transform.position, player.position);
-            if (distance <= attackRange)
+            Collider2D hit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
+            if (hit != null && !Attack)
             {
                 Attack = true;
-                animator.SetTrigger("Attack");
-                facingRight = (player.position.x - transform.position.x) > 0;
-                Invoke(nameof(EndAttack), 0.5f); // d�lai arbitraire, adapter � l'animation
+                animator.SetTrigger("Attacking");
             }
         }
     }
-
-    void EndAttack()
+    void RespawnToLastPlatform()
     {
-        Attack = false;
+        rb.linearVelocity = Vector2.zero;
+
+        if (lastPlatform != null)
+        {
+            Vector3 platformTop = lastPlatform.position + Vector3.up * 1f;
+            transform.position = platformTop;
+        }
+        else
+        {
+            transform.position = lastSafePosition;
+        }
+    }
+
+    void HandleFlip(float directionX)
+    {
+        if (directionX < 0)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x *= 1;
+            transform.localScale = scale;
+        }
+        if (directionX > 0)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
+        }
     }
 
     void ApplySquashAndStretch()
@@ -131,7 +190,7 @@ public class EnemyAI2D : MonoBehaviour
         float stretchX = Mathf.Lerp(1f, 1.2f, speedFactor);
         float squashY = Mathf.Lerp(1f, 0.85f, speedFactor);
 
-        Vector3 targetScale = new Vector3(stretchX * (facingRight ? 1 : -1), squashY, 1f);
+        Vector3 targetScale = new Vector3(stretchX * Mathf.Sign(transform.localScale.x), squashY, 1f);
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, 0.1f);
     }
 

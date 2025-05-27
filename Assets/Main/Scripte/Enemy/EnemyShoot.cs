@@ -18,22 +18,23 @@ public class EnemyShoot : MonoBehaviour
     private EnemyAI2D enemyAI;
     private Animator animator;
 
-    public AnimationClip AnimationAttack;
-
-    public AnimatorController AnimationController;
-
     void Start()
     {
         animator = GetComponent<Animator>();
         enemyAI = GetComponent<EnemyAI2D>();
-        player = enemyAI.player;
+        player = FindAnyObjectByType<PlayerActionMove>().transform;
 
         shootForce = Random.Range(10f, 15f);
     }
 
     void Update()
     {
-        isChasing = enemyAI.chasing;
+        player = FindAnyObjectByType<PlayerActionMove>().transform;
+
+        if (enemyAI != null)
+        {
+            isChasing = enemyAI.chasing;
+        }
 
         if (isChasing)
         {
@@ -50,19 +51,16 @@ public class EnemyShoot : MonoBehaviour
 
     public void ShootKayou()
     {
-        if (!enemyAI.Attack)
+        GameObject kayou = Instantiate(kayouPrefab, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+
+        Vector2 direction = (player.position - transform.position).normalized;
+
+        Rigidbody2D kayouRb = kayou.GetComponent<Rigidbody2D>();
+        if (kayouRb != null)
         {
-            enemyAI.Attack = true;
-            GameObject kayou = Instantiate(kayouPrefab, transform.position + new Vector3(0,1f,0), Quaternion.identity);
-
-            Vector2 direction = (player.position - transform.position).normalized;
-
-            Rigidbody2D kayouRb = kayou.GetComponent<Rigidbody2D>();
-            if (kayouRb != null)
-            {
-                kayouRb.linearVelocity = direction * shootForce;
-            }
+            kayouRb.linearVelocity = direction * shootForce;
         }
+        
     }
 
     public void RestartAttack()

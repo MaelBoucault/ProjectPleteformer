@@ -47,6 +47,8 @@ public class EnfantScript : MonoBehaviour
             RespawnToLastPlatform();
         }
 
+        animator.SetBool("IsStund", isPaused);
+
         if (isPaused)
         {
             rb.linearVelocity = Vector2.zero;
@@ -162,6 +164,7 @@ public class EnfantScript : MonoBehaviour
     IEnumerator PauseAtPosition()
     {
         isPaused = true;
+        
         isChasing = false;
         rb.linearVelocity = Vector2.zero;
         yield return new WaitForSeconds(pauseDuration);

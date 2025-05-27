@@ -66,7 +66,7 @@ public class PlayerHealth : MonoBehaviour
             if (Amount < 0)
             {
 
-                float vignetteIntensity = Mathf.Clamp01(Mathf.Abs(Amount) / 50f);
+                float vignetteIntensity = Mathf.Clamp01(Mathf.Abs(Amount) / 20f);
                 StartCoroutine(ShowPostProcessVignette(vignetteIntensity));
 
 
@@ -74,8 +74,8 @@ public class PlayerHealth : MonoBehaviour
                 float shakeDuration = Mathf.Lerp(0.1f, 0.4f, shakeIntensity);
                 CameraShake.Shake(shakeIntensity * 0.2f, shakeDuration);
 
-                float punchAmount = Mathf.Abs(Amount) * 0.2f;
-                if (punchAmount >= 1f) punchAmount = 1f;
+                float punchAmount = Mathf.Abs(Amount) * 0.5f;
+                if (punchAmount >= 2f) punchAmount = 2f;
 
                 float randomTime = Random.Range(time - 0.5f, time + 0.5f);
 

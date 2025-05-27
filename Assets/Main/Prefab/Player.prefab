@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 5931720963350407740}
   - component: {fileID: 5062128734055588523}
   - component: {fileID: 4000995869307229325}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -253,7 +253,6 @@ MonoBehaviour:
   NbDash: 3
   NbDashCurl: 3
   CanDash: 0
-  IsDashing: 0
   maxMana: 100
   manaRegenRate: 50
   currentMana: 100
@@ -346,7 +345,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6486469841503608453}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CheckGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -377,7 +376,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6672085711544422650}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ThrowT
   m_TagString: Untagged
   m_Icon: {fileID: 0}

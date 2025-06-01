@@ -1,45 +1,40 @@
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ManagerScripte : MonoBehaviour
 {
-    private int nbEnnemies;
-    private float nbTotalHealth;
-    private float nbTotalHealthMax;
 
-    public Slider SliderTotalHealth;
-
+    PlayerActionMove Player;
 
     private void Start()
     {
-        UpdateEnnemiesCount();
-
-        nbTotalHealthMax = nbTotalHealth;
-
-        SliderTotalHealth.maxValue = nbTotalHealthMax;
-
+        Player = FindAnyObjectByType<PlayerActionMove>();
     }
+
     void Update()
     {
-        UpdateEnnemiesCount();
-
-        SliderTotalHealth.value = nbTotalHealth;
+        CheckForEnnemiesAndLoadNextLevel();
     }
 
-    void UpdateEnnemiesCount()
+    void CheckForEnnemiesAndLoadNextLevel()
     {
-        var enemies = GameObject
-        .FindGameObjectsWithTag("Ennemies")
-        .Select(e => e.GetComponent<EnnemieHealth>())
-        .Where(h => h != null && h.health > 0)
-        .ToList();
+        var remainingEnemies = GameObject
+            .FindGameObjectsWithTag("Ennemies")
+            .Select(e => e.GetComponent<EnnemieHealth>())
+            .Where(h => h != null && h.health > 0)
+            .ToList();
 
-        nbEnnemies = enemies.Count;
-
-        for (int i = 0; i < nbEnnemies; i++)
+        if (remainingEnemies.Count <= 0)
         {
-            nbTotalHealthMax += enemies[i].GetComponent<EnnemieHealth>().health;
+            LoadNextLevel();
         }
+    }
+
+    void LoadNextLevel()
+    {
+        Player.transform.position = new Vector3(0,5,0);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex + 1);
     }
 }

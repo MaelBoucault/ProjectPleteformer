@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4887826818001954414}
   - component: {fileID: 7295340924734992903}
-  - component: {fileID: 7639567420247398701}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -43,18 +42,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e393cb445c346094a93a9eff6108b960, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SliderTotalHealth: {fileID: 0}
---- !u!114 &7639567420247398701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 63041147588997155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7853b47920067a840b3cde6d00c600a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

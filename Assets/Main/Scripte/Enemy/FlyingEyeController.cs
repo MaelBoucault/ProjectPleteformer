@@ -13,18 +13,18 @@ public class FlyingEyeController : MonoBehaviour
 
     [Header("Références de Prefabs")]
     public GameObject rayPrefab;
-    public GameObject magicParticles;
-    public GameObject chargingWavePrefab;
+    public GameObject chargingWavePrefab; // Ajouté pour l'aura de charge
 
     [Header("Cible")]
     public Transform target;
 
     [Header("Rayon")]
-    public float rotationLerpSpeed = 5f;
-    public float lengthLerpSpeed = 5f;
-    public float targetRayLength = 100f;
+    public float chargeTime = 5f;
+    public float rayOffsetRange = 2f;
+    public float rayDurationAfterFire = 0.5f;
 
-    [Header("Rotation de base")]
+    [Header("Rotation de l'Oeil")]
+    public float rotationLerpSpeed = 5f;
     public float baseRotationOffset = 180f;
 
     private Vector3 startPos;
@@ -33,13 +33,25 @@ public class FlyingEyeController : MonoBehaviour
     private float lastAttackTime = -999f;
     private Rigidbody2D rb;
     private GameObject activeRay = null;
+    private GameObject activeChargingWave = null; // Instance de l'aura
 
-    private Quaternion currentRayRotation;
+    private EnemyAudioController enemyAudioController;
 
     void Start()
     {
+        enemyAudioController = GetComponent<EnemyAudioController>();
+        PlayerActionMove player = FindAnyObjectByType<PlayerActionMove>();
+        if (player != null)
+        {
+            target = player.transform;
+        }
+        else
+        {
+            Debug.LogError("PlayerActionMove non trouvé dans la scène ! Assurez-vous qu'un joueur existe.");
+            enabled = false;
+            return;
+        }
 
-        target = FindAnyObjectByType<PlayerActionMove>().transform;
         startPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
         PickNewWanderTarget();
@@ -49,14 +61,17 @@ public class FlyingEyeController : MonoBehaviour
     {
         MoveWander();
 
-        if (Vector3.Distance(transform.position, target.position) <= detectionRadius)
+        if (target != null)
         {
-            TryAttack();
+            Vector3 directionToPlayer = (target.position - transform.position).normalized;
+            float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg + baseRotationOffset;
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
         }
 
-        if (activeRay != null)
+        if (target != null && Vector3.Distance(transform.position, target.position) <= detectionRadius)
         {
-            activeRay.transform.position = transform.position;
+            TryAttack();
         }
     }
 
@@ -69,12 +84,6 @@ public class FlyingEyeController : MonoBehaviour
 
         Vector3 dir = (wanderTarget - transform.position).normalized;
         rb.MovePosition(transform.position + dir * moveSpeed * Time.deltaTime);
-
-        if (dir != Vector3.zero)
-        {
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + baseRotationOffset;
-            transform.rotation = Quaternion.Euler(0f, 0f, angle);
-        }
     }
 
     void PickNewWanderTarget()
@@ -87,9 +96,10 @@ public class FlyingEyeController : MonoBehaviour
 
     void TryAttack()
     {
-        if (Time.time - lastAttackTime >= attackCooldown && activeRay == null)
+        if (Time.time - lastAttackTime >= attackCooldown && activeRay == null && activeChargingWave == null)
         {
             lastAttackTime = Time.time;
+            enemyAudioController.PlayYeuxCharge();
             StartCoroutine(ChargeAndFire());
         }
     }
@@ -98,82 +108,80 @@ public class FlyingEyeController : MonoBehaviour
     {
         if (target == null) yield break;
 
-        LookAtTarget();
-
-        GameObject wave = null;
-        float chargeTime = 2.5f;
+        Debug.Log("Oeil: Début de la charge...");
 
         if (chargingWavePrefab != null)
         {
-            wave = Instantiate(chargingWavePrefab, transform.position, Quaternion.identity);
-            wave.transform.localScale = Vector3.one * 2f;
-            wave.transform.SetParent(transform);
+            if (activeChargingWave != null)
+            {
+                Destroy(activeChargingWave);
+                activeChargingWave = null;
+            }
 
-            // Tourne pendant 2.5s (on garde iTween ici)
-            iTween.RotateBy(wave, iTween.Hash("z", 2f, "time", chargeTime, "easetype", "linear"));
+            activeChargingWave = Instantiate(chargingWavePrefab, transform.position, Quaternion.identity);
+            activeChargingWave.transform.localScale = Vector3.one * 2f;
+            activeChargingWave.transform.SetParent(transform);
 
-            // Déplacement subtil
-            iTween.MoveBy(wave, iTween.Hash(
+            iTween.RotateBy(activeChargingWave, iTween.Hash("z", 2f, "time", chargeTime, "easetype", "linear"));
+            iTween.MoveBy(activeChargingWave, iTween.Hash(
                 "x", 0.05f, "y", 0.05f,
                 "time", chargeTime,
                 "islocal", true,
                 "easetype", "easeInOutSine"
             ));
 
-            // Shrink manuellement
-            Vector3 initialScale = wave.transform.localScale;
+            Vector3 initialScale = activeChargingWave.transform.localScale;
             float elapsed = 0f;
 
             while (elapsed < chargeTime)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / chargeTime;
-                wave.transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, Mathf.Pow(t, 2)); // easeIn
+                activeChargingWave.transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, Mathf.Pow(t, 2));
                 yield return null;
             }
 
-            Destroy(wave);
+            if (activeChargingWave != null)
+            {
+                Destroy(activeChargingWave);
+                activeChargingWave = null;
+            }
         }
         else
         {
             yield return new WaitForSeconds(chargeTime);
         }
 
-        FireRay();
-    }
+        Debug.Log("Oeil: Rayon prêt à tirer !");
+        enemyAudioController.PlayYeuxTire();
 
-    void LookAtTarget()
-    {
-        if (target != null)
+        if (activeRay != null)
         {
-            Vector2 dir = (target.position - transform.position).normalized;
-
-            float baseAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            float randomOffset = Random.Range(-5f, 5f);
-            float finalAngle = baseAngle + randomOffset + baseRotationOffset;
-
-            Quaternion targetRotation = Quaternion.Euler(0f, 0f, finalAngle);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
+            Destroy(activeRay);
+            activeRay = null;
         }
-    }
 
-    void FireRay()
-    {
         if (rayPrefab != null && target != null)
         {
-            Vector2 dir = (target.position - transform.position).normalized;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            float randomOffset = Random.Range(15f, 30f);
-            angle += randomOffset;
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-rayOffsetRange, rayOffsetRange),
+                Random.Range(-rayOffsetRange, rayOffsetRange),
+                0f
+            );
+            Vector3 finalTargetPosition = target.position + randomOffset;
 
-            Quaternion rayRotation = Quaternion.Euler(0f, 0f, angle);
+            activeRay = Instantiate(rayPrefab, transform.position, Quaternion.identity);
 
-            activeRay = Instantiate(rayPrefab, transform.position, rayRotation);
-            activeRay.transform.parent = transform;
+            Vector3 rayDirection = (finalTargetPosition - activeRay.transform.position).normalized;
+            float angle = Mathf.Atan2(rayDirection.y, rayDirection.x) * Mathf.Rad2Deg + (Random.Range(-20, 20));
+
+            activeRay.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+            StartCoroutine(DestroyRayAfterSeconds(rayDurationAfterFire));
         }
         else
         {
-            Debug.LogWarning("rayPrefab ou target est null !");
+            Debug.LogWarning("rayPrefab ou target est null ! Impossible de tirer le rayon.");
         }
     }
 

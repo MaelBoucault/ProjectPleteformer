@@ -101,6 +101,7 @@ public class PlayerHealth : MonoBehaviour
         }
         if (CurrentHealth <= 0)
         {
+            
             CurrentHealth = 0;
             Death();
         }
@@ -115,9 +116,12 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+
     void Death()
     {
-        SceneManager.LoadScene(0);
+        CurrentHealth = MaxHealth;
+        transform.position = new Vector3(0, 5, 0);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private IEnumerator InvincibilityCoroutine()

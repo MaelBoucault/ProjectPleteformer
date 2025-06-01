@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using UnityEditor.Build;
+using UnityEditor.Build; // Note: UnityEditor namespace should not be in runtime scripts
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,6 +49,9 @@ public class PlayerActionMove : MonoBehaviour
     private float horizontal;
     private float vertical;
 
+    // Référence au PlayerSoundController
+    private PlayerSoundController playerSoundController;
+
 
     void Awake()
     {
@@ -57,6 +60,13 @@ public class PlayerActionMove : MonoBehaviour
         PlayerMovementScript = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
         currentMana = maxMana;
+
+        // Récupère le PlayerSoundController sur le même GameObject
+        playerSoundController = GetComponent<PlayerSoundController>();
+        if (playerSoundController == null)
+        {
+            Debug.LogWarning("PlayerActionMove: PlayerSoundController not found on this GameObject. Action sounds might not play.");
+        }
     }
 
     void Update()
@@ -96,7 +106,8 @@ public class PlayerActionMove : MonoBehaviour
         Morve.SetActive(CanDash);
 
         //Pilier
-        if (Input.GetKeyDown(KeyCode.Q)){
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
 
             if (PilierPrefab != null && Pilier > 0 && !IsInstancingPilier)
             {
@@ -117,6 +128,11 @@ public class PlayerActionMove : MonoBehaviour
                     "easetype", iTween.EaseType.easeOutBack
                 ));
                 StartCoroutine(ResetPilier());
+
+                if (playerSoundController != null)
+                {
+                    playerSoundController.PlayAttackSound(); // Joue un son d'attaque pour le pilier
+                }
             }
         }
 
@@ -131,9 +147,8 @@ public class PlayerActionMove : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 10f);
 
             if (hit.collider != null)
-
-
-                if (hit.collider.gameObject.layer == 3)
+            {
+                if (hit.collider.gameObject.layer == 3) // Assurez-vous que le layer 3 est le sol ou un objet chargeable
                 {
                     Vector3 spawnPosition = hit.point;
 
@@ -152,7 +167,13 @@ public class PlayerActionMove : MonoBehaviour
                         "time", 0.3f,
                         "easetype", iTween.EaseType.easeOutExpo
                     ));
+
+                    if (playerSoundController != null)
+                    {
+                        playerSoundController.PlayAttackSound(); // Joue un son d'attaque pour la charge au sol
+                    }
                 }
+            }
         }
     }
 
@@ -165,14 +186,11 @@ public class PlayerActionMove : MonoBehaviour
             if (!collision.GetComponent<Pilier>() && !IsInstancingPilier)
                 Pilier = PilierMax;
         }
-
-        
     }
 
 
     void StartDash()
     {
-
         NbDashCurl--;
         dashTimer = dashDuration;
         cooldownTimer = dashCooldown;
@@ -193,9 +211,12 @@ public class PlayerActionMove : MonoBehaviour
             "easetype", iTween.EaseType.easeOutQuad
         ));
         isDashing = true;
+
+        if (playerSoundController != null)
+        {
+            playerSoundController.PlayDashSound(); // Joue le son de dash
+        }
     }
-
-
 
 
     void EndDash()
@@ -203,7 +224,6 @@ public class PlayerActionMove : MonoBehaviour
         isDashing = false;
         rb.linearVelocity = Vector2.zero;
         Animator.SetBool("IsDashHorizontal", isDashing);
-
     }
 
     void HandleMana()

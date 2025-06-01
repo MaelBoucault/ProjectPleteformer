@@ -36,9 +36,19 @@ public class PlayerMovement : MonoBehaviour
     public Animator animator;
 
     private PlayerActionMove dashScript;
+    // Changé de SoundScripte à PlayerSoundController
+    private PlayerSoundController playerSoundController;
+
 
     void Awake()
     {
+        // Récupère le PlayerSoundController sur le même GameObject
+        playerSoundController = GetComponent<PlayerSoundController>();
+        if (playerSoundController == null)
+        {
+            Debug.LogWarning("PlayerMovement: PlayerSoundController not found on this GameObject. Jump sounds might not play.");
+        }
+
         rb = GetComponent<Rigidbody2D>();
         dashScript = GetComponent<PlayerActionMove>();
         JumpNb = JumpNbMax;
@@ -64,13 +74,22 @@ public class PlayerMovement : MonoBehaviour
             gameObject.GetComponent<Transform>().localScale = new Vector3(-0.5f, 0.5f, 1);
         }
 
-        bool isGrounded = CheckGrounded();
+        bool isCurrentlyGrounded = CheckGrounded(); // Utiliser une variable temporaire pour le check actuel
 
-        if (isGrounded)
+        if (isCurrentlyGrounded) // Si le joueur est actuellement au sol
         {
+            // Si le joueur vient d'atterrir (était en l'air et est maintenant au sol)
+            if (!isGrounded)
+            {
+                // Optionnel: Jouer un son d'atterrissage ici si vous en avez un (ex: AudioType.Land)
+                // playerSoundController.PlayLandSound(); 
+            }
             JumpNb = JumpNbMax;
             Jump = false;
         }
+        // Mettre à jour l'état isGrounded après le check
+        isGrounded = isCurrentlyGrounded;
+
 
         // Coyote time logic
         coyoteTimer = isGrounded ? coyoteTime : coyoteTimer - Time.deltaTime;
@@ -93,6 +112,10 @@ public class PlayerMovement : MonoBehaviour
                 jumpBufferTimer = 0;
                 JumpNb--;
                 Jump = true;
+                if (playerSoundController != null)
+                {
+                    playerSoundController.PlayJumpSound(); // Joue le son de saut
+                }
             }
             else if (JumpNb > 0)
             {
@@ -100,6 +123,10 @@ public class PlayerMovement : MonoBehaviour
                 jumpBufferTimer = 0;
                 JumpNb--;
                 Jump = true;
+                if (playerSoundController != null)
+                {
+                    playerSoundController.PlayJumpSound(); // Joue le son de saut
+                }
             }
         }
 
@@ -124,14 +151,13 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleJumpMana()
     {
-        isGrounded = CheckGrounded();
+        isGrounded = CheckGrounded(); // Cette ligne est redondante avec le début de Update(), mais je la laisse pour ne pas trop modifier la logique existante.
 
         if (JumpNb < JumpNbMax && isGrounded)
         {
             JumpNb += 0.5f * Time.deltaTime;
             JumpNb = Mathf.Min(JumpNb, JumpNbMax);
         }
-
     }
 
     void OnDrawGizmosSelected()

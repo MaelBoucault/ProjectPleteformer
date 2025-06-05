@@ -24,8 +24,12 @@ public class ManagerScripte : MonoBehaviour
             .Select(e => e.GetComponent<EnnemieHealth>())
             .Where(h => h != null && h.health > 0)
             .ToList();
-
-        if (remainingEnemies.Count <= 0)
+        var barde = GameObject
+            .FindGameObjectsWithTag("Barde")
+            .Select(e => e.GetComponent<EnnemieHealth>())
+            .Where(h => h != null && h.health > 0)
+            .ToList();
+        if (remainingEnemies.Count + barde.Count <= 0)
         {
             LoadNextLevel();
         }

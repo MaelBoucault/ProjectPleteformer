@@ -126,7 +126,6 @@ public class EnfantScript : MonoBehaviour
             isChasing = true;
             chaseTimer = 0f;
 
-            // Facultatif : effet visuel ou animation de réaction
             Aurra.SetActive(true);
         }
     }

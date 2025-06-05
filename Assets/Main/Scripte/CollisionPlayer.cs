@@ -19,7 +19,7 @@ public class CollisionPlayer : MonoBehaviour
     {
         if (collision.gameObject.tag == "Fall")
         {
-            gameObject.GetComponent<PlayerHealth>().UpdateHealth(-gameObject.GetComponent<PlayerHealth>().MaxHealth, new Vector3(0, 0, 0));
+            gameObject.GetComponent<PlayerHealth>().UpdateHealth(-gameObject.GetComponent<PlayerHealth>().MaxHealth, new Vector3(0, 2, 0));
             if (playerSoundController != null)
             {
                 playerSoundController.PlayDieSound();
@@ -28,7 +28,7 @@ public class CollisionPlayer : MonoBehaviour
 
         if (collision.gameObject.tag == "Respawn")
         {
-            gameObject.transform.position = new Vector3(0, 0, 0);
+            gameObject.transform.position = new Vector3(0, 3, 0);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
@@ -37,7 +37,7 @@ public class CollisionPlayer : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.L))
         {
-            gameObject.transform.position = new Vector3(0, 0, 0);
+            gameObject.transform.position = new Vector3(0, 3, 0);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }

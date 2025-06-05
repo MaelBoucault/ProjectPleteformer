@@ -1,4 +1,3 @@
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -120,7 +119,7 @@ public class PlayerHealth : MonoBehaviour
     void Death()
     {
         CurrentHealth = MaxHealth;
-        transform.position = new Vector3(0, 5, 0);
+        transform.position = new Vector3(0, 3, 0);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

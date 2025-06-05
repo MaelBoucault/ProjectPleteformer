@@ -14,7 +14,7 @@ public class EnemyShoot : MonoBehaviour
 
     private EnemyAI2D enemyAI;
     private Animator animator;
-    private EnemyAudioController enemyAudioController; // Reference to the audio script
+    private EnemyAudioController enemyAudioController;
 
     void Start()
     {
@@ -33,7 +33,6 @@ public class EnemyShoot : MonoBehaviour
 
     void Update()
     {
-        // Find player only if null
         if (player == null)
         {
             player = FindAnyObjectByType<PlayerActionMove>()?.transform;
@@ -51,21 +50,18 @@ public class EnemyShoot : MonoBehaviour
 
             if (shootTimer >= shootInterval && !hasShot)
             {
-                animator.SetBool("Attacking", true); // Trigger the attack animation
+                animator.SetBool("Attacking", true);
                 shootTimer = 0f;
                 hasShot = true;
 
-                // Play the charge sound. EnemyAudioController will determine if it's Ogre or Yeux.
                 if (enemyAudioController != null)
                 {
-                    // Calling the specific method for charge sound
-                    enemyAudioController.PlayOgreAttackCharge(); // Or "AttackCharge" for Ogre if you use it in the map
+                    enemyAudioController.PlayOgreAttackCharge();
                 }
             }
         }
     }
 
-    // This function should be called by an Animation Event in your Animator
     public void ShootKayou()
     {
         if (kayouPrefab == null || player == null) return;

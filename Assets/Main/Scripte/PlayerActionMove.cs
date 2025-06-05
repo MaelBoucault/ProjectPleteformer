@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using UnityEditor.Build; // Note: UnityEditor namespace should not be in runtime scripts
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -131,7 +130,7 @@ public class PlayerActionMove : MonoBehaviour
 
                 if (playerSoundController != null)
                 {
-                    playerSoundController.PlayAttackSound(); // Joue un son d'attaque pour le pilier
+                    playerSoundController.PlayAttackSound();
                 }
             }
         }
@@ -211,11 +210,6 @@ public class PlayerActionMove : MonoBehaviour
             "easetype", iTween.EaseType.easeOutQuad
         ));
         isDashing = true;
-
-        if (playerSoundController != null)
-        {
-            playerSoundController.PlayDashSound(); // Joue le son de dash
-        }
     }
 
 

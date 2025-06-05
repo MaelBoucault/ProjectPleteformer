@@ -18,7 +18,7 @@ public class ZoneDeSoin : MonoBehaviour
 
         while (timer < duration)
         {
-            Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, 3f); // rayon de la zone
+            Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, 3f); 
 
             foreach (Collider2D col in enemies)
             {

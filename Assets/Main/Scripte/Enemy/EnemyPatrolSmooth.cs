@@ -63,37 +63,29 @@ public class EnemyPatrolSmooth : MonoBehaviour
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // Check if player is in detection range
         if (distanceToPlayer > detectionRange)
             return false;
 
-        // Check if player is within field of view
         float angle = Vector3.Angle(transform.right, directionToPlayer);
         if (angle > fieldOfView / 2f)
             return false;
 
-        // Raycast to check for obstacles
         if (Physics2D.Raycast(transform.position, directionToPlayer, distanceToPlayer, obstacleMask))
             return false;
 
         return true;
     }
 
-
     void OnDrawGizmosSelected()
     {
         if (player == null) return;
 
         Gizmos.color = Color.yellow;
-
-        // Dessiner une ligne vers le joueur (facultatif)
         Gizmos.DrawLine(transform.position, player.position);
 
-        // Rayon de détection
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // Afficher le cône du champ de vision
         Vector3 rightBoundary = Quaternion.Euler(0, 0, fieldOfView / 2) * transform.right;
         Vector3 leftBoundary = Quaternion.Euler(0, 0, -fieldOfView / 2) * transform.right;
 
@@ -101,5 +93,4 @@ public class EnemyPatrolSmooth : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + rightBoundary * detectionRange);
         Gizmos.DrawLine(transform.position, transform.position + leftBoundary * detectionRange);
     }
-
 }

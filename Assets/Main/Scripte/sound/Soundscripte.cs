@@ -129,7 +129,7 @@ public class SoundScripte : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"SoundScripte: No AudioSource configured for type {sourceType}. Please check your 'Audio Source Configs' in the Inspector.");
+            Debug.Log($"SoundScripte: No AudioSource configured for type {sourceType}. Please check your 'Audio Source Configs' in the Inspector.");
         }
     }
 
@@ -142,7 +142,7 @@ public class SoundScripte : MonoBehaviour
                 return data.clip;
             }
         }
-        Debug.LogError("SoundScripte: No AudioClip found for type " + type + ". Make sure it's assigned in 'Audio Data' in the Inspector.");
+        Debug.Log("SoundScripte: No AudioClip found for type " + type + ". Make sure it's assigned in 'Audio Data' in the Inspector.");
         return null;
     }
 }

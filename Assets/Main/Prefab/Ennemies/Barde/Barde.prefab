@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 3158352228280848315}
   m_Layer: 0
   m_Name: Barde
-  m_TagString: Ennemies
+  m_TagString: Barde
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

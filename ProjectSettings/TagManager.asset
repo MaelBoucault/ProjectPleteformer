@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ennemies
   - Fall
+  - Barde
   layers:
   - Default
   - TransparentFX
@@ -14,7 +15,7 @@ TagManager:
   - Water
   - UI
   - Player
-  - 
+  - Ennemies
   - 
   - 
   - 

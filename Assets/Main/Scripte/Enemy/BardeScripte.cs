@@ -55,7 +55,7 @@ public class BardeScripte : MonoBehaviour
 
     private bool isExploding = false;
 
-    private EnemyAudioController audioController; // Référence à l'audio controller
+    private EnemyAudioController audioController;
 
     private void Start()
     {
@@ -74,9 +74,8 @@ public class BardeScripte : MonoBehaviour
 
     private void Update()
     {
-        if (isTeleporting || isEvading) return; // Ne pas bouger si on téléporte ou évite
+        if (isTeleporting || isEvading) return; // Ne pas bouger si on tp ou évite
 
-        // Si on a une cible de soin, on s'y positionne
         if (currentTarget != null)
         {
             Vector3 directionAwayFromPlayer = (currentTarget.position - player.position).normalized;
@@ -95,19 +94,19 @@ public class BardeScripte : MonoBehaviour
         }
         else // Pas de cible de soin, et pas en mode attaque (sinon l'attaque gère le mouvement)
         {
-            // Évitement du joueur quand il est proche et qu'on n'attaque pas
+            // Évitement du joueur quand il est proche
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-            if (!attackingPlayerMode && distanceToPlayer < 15f) // isEvading est géré par la coroutine iTween
+            if (!attackingPlayerMode && distanceToPlayer < 15f) 
             {
                 Vector3 evadeDirection = (transform.position - player.position).normalized;
                 Vector3 evadeTarget = transform.position + evadeDirection * 10f;
 
-                isEvading = true; // On met isEvading à true pour empêcher Update de bouger le barde
+                isEvading = true; 
                 iTween.MoveTo(gameObject, iTween.Hash(
                     "position", evadeTarget,
                     "time", 0.3f,
                     "easetype", iTween.EaseType.easeOutSine,
-                    "oncomplete", "EndEvade" // EndEvade remettra isEvading à false
+                    "oncomplete", "EndEvade"
                 ));
                 audioController?.PlayBardeFuit();
             }
@@ -126,7 +125,7 @@ public class BardeScripte : MonoBehaviour
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, soinRange);
             foreach (Collider2D col in colliders)
             {
-                if (col.CompareTag("Ennemies"))
+                if (col.CompareTag("Ennemies") && col.gameObject != gameObject)
                 {
                     EnnemieHealth ennemi = col.GetComponent<EnnemieHealth>();
                     if (ennemi != null && ennemi.health < ennemi.maxHealth)
@@ -192,7 +191,6 @@ public class BardeScripte : MonoBehaviour
             }
             else // Pas de cible de soin trouvée
             {
-                // Désactiver l'aura si elle était active
                 if (isHealing)
                 {
                     SetAuraAlpha(0.5f);
@@ -214,10 +212,9 @@ public class BardeScripte : MonoBehaviour
 
     IEnumerator HandlePlayerAttackPhase()
     {
-        while (attackingPlayerMode && !AreThereEnemiesLeft()) // Assurez-vous qu'on est en mode attaque et qu'il n'y a pas d'ennemis
+        while (attackingPlayerMode && !AreThereEnemiesLeft())
         {
-            // Vérifie si on ne devrait pas arrêter (par exemple, si explosant)
-            if (isExploding) yield break; // isTeleporting et isEvading sont gérés par Update/leurs propres coroutines
+            if (isExploding) yield break;
 
             // Décide de l'action: téléporter ou bouger autour
             float actionRoll = Random.Range(0f, 1f);
@@ -228,14 +225,14 @@ public class BardeScripte : MonoBehaviour
                 Vector3 teleportPos = player.position + new Vector3(randomOffset.x, randomOffset.y, 0f);
                 yield return StartCoroutine(TeleportToPosition(teleportPos));
             }
-            else // 40% de chance de faire un mouvement orbital
+            else // 40% de chance de faire un mouvement autour
             {
                 float angle = Random.Range(0f, 360f);
                 Vector3 orbitalTarget = player.position + (Vector3)(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)).normalized * Random.Range(teleportDistanceRange.x, teleportDistanceRange.y));
 
                 iTween.MoveTo(gameObject, iTween.Hash(
                     "position", orbitalTarget,
-                    "time", Random.Range(0.8f, 1.5f), // Mouvement un peu plus lent et contrôlé
+                    "time", Random.Range(0.8f, 1.5f),
                     "easetype", iTween.EaseType.easeInOutSine
                 ));
                 yield return new WaitForSeconds(Random.Range(0.8f, 1.5f)); // Attendre la fin du mouvement
@@ -247,7 +244,7 @@ public class BardeScripte : MonoBehaviour
                 if (healProjectilePrefab != null)
                 {
                     Vector3 direction = (player.position - transform.position).normalized;
-                    float angleOffset = Random.Range(-30f, 30f); // Angle de tir plus large
+                    float angleOffset = Random.Range(-30f, 30f);
                     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + angleOffset;
 
                     Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
@@ -256,8 +253,7 @@ public class BardeScripte : MonoBehaviour
                     HealProjectile projectile = proj.GetComponent<HealProjectile>();
                     if (projectile != null)
                     {
-                        Vector3 target = player.position + (Vector3)(Random.insideUnitCircle * 1f); // Cible un peu plus imprécise
-                        projectile.SetTarget(target, player);
+                        Vector3 target = player.position + (Vector3)(Random.insideUnitCircle * 1f);
                     }
                     audioController?.PlayBardeAttack();
 
@@ -267,10 +263,9 @@ public class BardeScripte : MonoBehaviour
                         "easetype", iTween.EaseType.easeOutBack
                     ));
                 }
-                yield return new WaitForSeconds(Random.Range(0.1f, 0.4f)); // Délai entre les tirs d'une salve
+                yield return new WaitForSeconds(Random.Range(0.1f, 0.4f)); 
             }
 
-            // Vérifier à nouveau la condition avant le prochain cycle
             if (AreThereEnemiesLeft())
             {
                 attackingPlayerMode = false;
@@ -279,13 +274,12 @@ public class BardeScripte : MonoBehaviour
                     StopCoroutine(attackRoutineInstance);
                     attackRoutineInstance = null;
                 }
-                yield break; // Sortir de la coroutine d'attaque
+                yield break;
             }
 
             yield return new WaitForSeconds(Random.Range(attackActionIntervalRange.x, attackActionIntervalRange.y)); // Attendre avant la prochaine action
         }
 
-        // Si la boucle se termine (plus en attackingPlayerMode ou ennemis sont apparus)
         attackingPlayerMode = false;
         attackRoutineInstance = null;
     }
@@ -347,8 +341,8 @@ public class BardeScripte : MonoBehaviour
     public void OnStartExplosion()
     {
         isExploding = true;
-        attackingPlayerMode = false; // Assurez-vous que le mode attaque est désactivé
-        isTeleporting = true; // Pour bloquer tout mouvement
-        StopAllCoroutines(); // Stoppe toutes les coroutines, y compris HandlePlayerAttackPhase
+        attackingPlayerMode = false;
+        isTeleporting = true; 
+        StopAllCoroutines(); 
     }
 }

@@ -12,8 +12,8 @@ public class EnemyAI2D : MonoBehaviour
     public LayerMask playerLayer;
 
     public float groundCheckDistance = 0.2f;
-    public Transform groundCheck; // Renommé de groundCheckRight
-    public Transform wallCheck;   // Renommé de wallCheckRight
+    public Transform groundCheck;
+    public Transform wallCheck;
     public LayerMask platformLayer;
 
     private Rigidbody2D rb;
@@ -128,7 +128,6 @@ public class EnemyAI2D : MonoBehaviour
 
     void Patrol()
     {
-        // Décalage du point de vérification en fonction de la direction de déplacement
         Vector3 currentGroundCheckPosition = groundCheck.position;
         Vector3 currentWallCheckPosition = wallCheck.position;
         Vector2 checkDirection = Vector2.zero;
@@ -280,7 +279,6 @@ public class EnemyAI2D : MonoBehaviour
         Gizmos.color = Color.yellow;
         if (wallCheck != null)
         {
-            // Dessine le wallCheck dans les deux directions pour visualisation
             Gizmos.DrawLine(wallCheck.position, wallCheck.position + Vector3.left * 0.2f);
             Gizmos.DrawLine(wallCheck.position, wallCheck.position + Vector3.right * 0.2f);
         }
@@ -288,7 +286,6 @@ public class EnemyAI2D : MonoBehaviour
         Gizmos.color = Color.magenta;
         if (groundCheck != null)
         {
-            // Dessine les raycasts de "sol devant" pour visualisation
             Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDistance);
         }
     }

@@ -13,7 +13,7 @@ public class FlyingEyeController : MonoBehaviour
 
     [Header("Références de Prefabs")]
     public GameObject rayPrefab;
-    public GameObject chargingWavePrefab; // Ajouté pour l'aura de charge
+    public GameObject chargingWavePrefab;
 
     [Header("Cible")]
     public Transform target;
@@ -33,7 +33,7 @@ public class FlyingEyeController : MonoBehaviour
     private float lastAttackTime = -999f;
     private Rigidbody2D rb;
     private GameObject activeRay = null;
-    private GameObject activeChargingWave = null; // Instance de l'aura
+    private GameObject activeChargingWave = null;
 
     private EnemyAudioController enemyAudioController;
 
